@@ -24,8 +24,15 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback_local_secret')
 VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY', 'BE_rEo8x630K3NCzt1I2OM_w2HJ-QW05pdNdjVbLn9qkXkbJrw8Ym2PeBQJgtzO2z42VZtLMMy_UqGdn2JWqH98')
 VAPID_PRIVATE_KEY_PEM = os.environ.get('VAPID_PRIVATE_KEY_PEM', '-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgVs6Q8H2QzKtCBYoI\nvAy8HpyS6MdURSyqxPC3QQbD5zWhRANCAARP6xKPMet9CtzQs7dSNjjP8NhyfkFt\nOaXTXY1Wy5/apF5Gya8PGJtj3gUCYLczts+NlWbSzDMv1KhnZ9iVqh/f\n-----END PRIVATE KEY-----')
 VAPID_CLAIMS = {'sub': 'mailto:keerthikeer2509@gmail.com'}
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///pixelres_v2.db')
+database_url = os.environ.get('DATABASE_URL', 'sqlite:///pixelres_v2.db')
+if database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Ensure database tables are created (important for Render/Production)
+with app.app_context():
+    db.create_all()
 
 # Increase payload limit for Base64 Images (e.g., 50 MB)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024 
@@ -356,9 +363,13 @@ def forgot_password():
             # Send Email
             subject = "🧊 GlacierGoals: Your Password Reset Code"
             body = f"Hello!\n\nYour 6-digit verification code to reset your password is: {code}\n\nThis code was requested just now. If you didn't request this, please ignore this email."
-            send_email_notification(email, subject, body)
+            sent = send_email_notification(email, subject, body)
             
-            flash('Verification code sent to your email!')
+            if sent:
+                flash('Verification code sent to your email!')
+            else:
+                flash('⚠️ Email server error. The code was printed to the app logs (Render Dashboard) as a fallback.')
+            
             return redirect(url_for('verify_reset', email=email))
         else:
             flash('If that email exists in our system, you will receive a code.')
@@ -1332,6 +1343,4 @@ def page_not_found(e):
     return render_template('404.html'), 404
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=True, port=5000)
