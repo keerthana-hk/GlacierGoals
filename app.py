@@ -19,6 +19,11 @@ groq_client = Groq(api_key=ai_key) if ai_key else None
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback_local_secret')
+
+# VAPID Keys for Web Push Notifications
+VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY', 'BE_rEo8x630K3NCzt1I2OM_w2HJ-QW05pdNdjVbLn9qkXkbJrw8Ym2PeBQJgtzO2z42VZtLMMy_UqGdn2JWqH98')
+VAPID_PRIVATE_KEY_PEM = os.environ.get('VAPID_PRIVATE_KEY_PEM', '-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgVs6Q8H2QzKtCBYoI\nvAy8HpyS6MdURSyqxPC3QQbD5zWhRANCAARP6xKPMet9CtzQs7dSNjjP8NhyfkFt\nOaXTXY1Wy5/apF5Gya8PGJtj3gUCYLczts+NlWbSzDMv1KhnZ9iVqh/f\n-----END PRIVATE KEY-----')
+VAPID_CLAIMS = {'sub': 'mailto:keerthikeer2509@gmail.com'}
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///pixelres_v2.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -150,6 +155,15 @@ class Notification(db.Model):
     is_read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+class PushSubscription(db.Model):
+    """Stores browser push subscriptions for each user (for native phone alerts)."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    endpoint = db.Column(db.Text, nullable=False)
+    p256dh = db.Column(db.Text, nullable=False)
+    auth = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 # Ensure database tables exist in production
 with app.app_context():
     import os
@@ -197,6 +211,66 @@ def create_notification(user_id, message, icon='🔔', title="GlacierGoals"):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+# ─── Web Push Notification Routes ─────────────────────────────────────────────
+
+@app.route('/api/vapid-public-key')
+def get_vapid_key():
+    """Returns the VAPID public key for the frontend to subscribe with."""
+    return jsonify({'publicKey': VAPID_PUBLIC_KEY})
+
+@app.route('/api/push/subscribe', methods=['POST'])
+@login_required
+def push_subscribe():
+    """Saves a user's push subscription to the database."""
+    data = request.get_json()
+    if not data or 'endpoint' not in data:
+        return jsonify({'error': 'Invalid subscription'}), 400
+    
+    endpoint = data['endpoint']
+    p256dh = data.get('keys', {}).get('p256dh', '')
+    auth = data.get('keys', {}).get('auth', '')
+    
+    # Avoid duplicates — if this endpoint already saved, update it 
+    existing = PushSubscription.query.filter_by(user_id=current_user.id, endpoint=endpoint).first()
+    if existing:
+        existing.p256dh = p256dh
+        existing.auth = auth
+    else:
+        sub = PushSubscription(user_id=current_user.id, endpoint=endpoint, p256dh=p256dh, auth=auth)
+        db.session.add(sub)
+    db.session.commit()
+    return jsonify({'status': 'subscribed'})
+
+@app.route('/api/push/send-test', methods=['POST'])
+@login_required
+def push_send_test():
+    """Sends a test push notification to all of the current user's subscriptions."""
+    send_web_push_to_user(current_user.id, '🧊 GlacierGoals', 'Push notifications are working! You\'ll now get reminders here.')
+    return jsonify({'status': 'sent'})
+
+def send_web_push_to_user(user_id, title, body, icon='/static/images/penguin_v2.jpg'):
+    """Core helper: sends a real push notification to all a user's saved devices."""
+    from pywebpush import webpush, WebPushException
+    import json
+    subs = PushSubscription.query.filter_by(user_id=user_id).all()
+    for sub in subs:
+        try:
+            webpush(
+                subscription_info={
+                    "endpoint": sub.endpoint,
+                    "keys": {"p256dh": sub.p256dh, "auth": sub.auth}
+                },
+                data=json.dumps({"title": title, "body": body, "icon": icon}),
+                vapid_private_key=VAPID_PRIVATE_KEY_PEM,
+                vapid_claims=VAPID_CLAIMS
+            )
+        except WebPushException as e:
+            # Subscription expired or invalid — remove it
+            if e.response and e.response.status_code in [404, 410]:
+                db.session.delete(sub)
+                db.session.commit()
+            print(f"WebPush error for user {user_id}: {e}")
 
 @app.route('/')
 def home():
@@ -1028,9 +1102,13 @@ def daily_habit_reminder():
                     pending.append(r.title)
             if pending:
                 count = len(pending)
-                create_notification(u.id,
-                    f"You still have {count} habit{'s' if count > 1 else ''} to do today! Don't break your streak 🔥",
-                    icon='⏰')
+                msg = f"You still have {count} habit{'s' if count > 1 else ''} to do today! Don't break your streak 🔥"
+                create_notification(u.id, msg, icon='⏰')
+                # Also send real phone push notification
+                threading.Thread(
+                    target=send_web_push_to_user,
+                    args=(u.id, '⏰ GlacierGoals Reminder', msg)
+                ).start()
 
 # --- Notification API Routes ---
 

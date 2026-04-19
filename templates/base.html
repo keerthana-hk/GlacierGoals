@@ -614,13 +614,57 @@ setInterval(loadNotifications, 30000);
 </script>
 {% endif %}
 <script>
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-        navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}").then(function(registration) {
-            console.log('ServiceWorker registration successful:', registration.scope);
-        }, function(err) {
-            console.log('ServiceWorker registration failed:', err);
+// ─── SERVICE WORKER + PUSH NOTIFICATIONS ────────────────────────────────────
+function urlB64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = atob(base64);
+    return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+
+async function subscribeToPushNotifications(registration) {
+    try {
+        const res = await fetch('/api/vapid-public-key');
+        const { publicKey } = await res.json();
+        const sub = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlB64ToUint8Array(publicKey)
         });
+        await fetch('/api/push/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(sub)
+        });
+        console.log('✅ GlacierGoals: Push notifications activated!');
+    } catch(e) {
+        console.log('Push subscription skipped:', e.message);
+    }
+}
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', async function() {
+        try {
+            const registration = await navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}");
+            console.log('ServiceWorker registered:', registration.scope);
+            
+            {% if current_user.is_authenticated %}
+            // Only ask for permission if user is logged in
+            if ('PushManager' in window && Notification.permission === 'default') {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    await subscribeToPushNotifications(registration);
+                }
+            } else if ('PushManager' in window && Notification.permission === 'granted') {
+                // Already granted — silently re-subscribe (handles new devices)
+                const existingSub = await registration.pushManager.getSubscription();
+                if (!existingSub) {
+                    await subscribeToPushNotifications(registration);
+                }
+            }
+            {% endif %}
+        } catch(err) {
+            console.log('ServiceWorker error:', err);
+        }
     });
 }
 </script>
