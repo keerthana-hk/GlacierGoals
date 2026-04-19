@@ -319,8 +319,28 @@ body.theme-midnight .hm-day { background: rgba(255,255,255,0.05); }
     .glass-navbar > div { width: auto; flex-direction: row; gap: 10px !important; }
     .logo { font-size: 1.4rem; }
     
-    /* Hide big buttons and themes in top bar to save pure space */
-    .nav-links, .theme-picker { display: none !important; }
+    /* Hide only the big nav link buttons — keep theme picker */
+    .nav-links { display: none !important; }
+    
+    /* Theme picker: show as a compact centered strip below the logo row */
+    .glass-navbar {
+        flex-wrap: wrap;
+    }
+    .theme-picker {
+        display: flex !important;
+        flex-wrap: nowrap;
+        justify-content: center;
+        gap: 7px !important;
+        width: 100%;
+        order: 3; /* Push below logo and notification bell */
+        padding: 6px 0 2px 0;
+        background: none !important;
+    }
+    .theme-picker button {
+        width: 26px !important;
+        height: 26px !important;
+        flex-shrink: 0;
+    }
 
     /* The new bottom mobile app navigation bar */
     .mobile-bottom-nav {
