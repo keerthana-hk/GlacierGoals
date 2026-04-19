@@ -150,6 +150,11 @@ class Notification(db.Model):
     is_read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+# Ensure database tables exist in production
+with app.app_context():
+    import os
+    os.makedirs(app.instance_path, exist_ok=True)
+    db.create_all()
 def create_notification(user_id, message, icon='🔔', title="GlacierGoals"):
     """Helper: creates an in-app notification for a specific user, with de-duplication."""
     # Commit any pending changes from the current session so we see what others have done
