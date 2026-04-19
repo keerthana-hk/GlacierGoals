@@ -306,7 +306,7 @@ def register():
         nickname = request.form.get('nickname', '')
         password = request.form.get('password')
 
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter(db.func.lower(User.email) == email).first()
         if user:
             flash('Email address already exists')
             return redirect(url_for('register'))
@@ -327,7 +327,7 @@ def login():
         password = request.form.get('password')
 
         print(f"DEBUG: LOGIN ATTEMPT: {email}")
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter(db.func.lower(User.email) == email).first()
         
         if not user or not check_password_hash(user.password, password):
             print(f"DEBUG: LOGIN FAIL: {'User not found' if not user else 'Password wrong'} for {email}")
@@ -349,7 +349,7 @@ def logout():
 def forgot_password():
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter(db.func.lower(User.email) == email).first()
         
         if user:
             import random
@@ -417,7 +417,7 @@ def reset_password():
         
     if request.method == 'POST':
         new_password = request.form.get('password')
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter(db.func.lower(User.email) == email).first()
         if user:
             user.password = generate_password_hash(new_password, method='pbkdf2:sha256')
             db.session.delete(reset_req)
