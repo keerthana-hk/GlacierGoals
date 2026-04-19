@@ -25,21 +25,21 @@
 .day-header-lbl {
     text-align: center;
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: 0.8rem;
     color: var(--text-light);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
 }
 .calendar-cell {
     background: var(--clay-bg);
-    min-height: 90px;
-    border-radius: 10px;
-    padding: 8px;
-    box-shadow: inset 2px 2px 5px rgba(255,255,255,0.8), 6px 6px 12px rgba(0,0,0,0.04);
+    min-height: 45px;
+    border-radius: 8px;
+    padding: 4px;
+    box-shadow: inset 1px 1px 3px rgba(255,255,255,0.8), 3px 3px 6px rgba(0,0,0,0.04);
     transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
     position: relative;
-    border: 2px solid transparent;
+    border: 1px solid transparent;
     display: flex;
     flex-direction: column;
 }
@@ -53,10 +53,10 @@
     border: 2px solid #3498db;
 }
 .date-number {
-    font-size: 1rem;
+    font-size: 0.85rem;
     font-weight: 800;
     color: var(--text-color);
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     display: inline-block;
 }
 .calendar-cell.today .date-number {
@@ -72,11 +72,11 @@
 .event-badge {
     background: rgba(241, 196, 15, 0.2);
     color: #b9770e;
-    padding: 6px 10px;
-    border-radius: 8px;
-    font-size: 0.85rem;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-size: 0.65rem;
     font-weight: 600;
-    margin-bottom: 6px;
+    margin-bottom: 3px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -134,15 +134,15 @@
     padding-top: 5px;
 }
 .mood-chip {
-    width: 24px;
-    height: 24px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.6);
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.05);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.8rem;
+    font-size: 0.65rem;
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     z-index: 2;
 }
@@ -156,24 +156,23 @@
 }
 </style>
 
-<div class="header-section" style="margin-bottom: 0;">
+<div class="header-section" style="margin-bottom: 10px;">
     <div>
-        <h1 style="margin:0;">📅 My Calendar</h1>
-        <p class="subtitle" style="margin-top: 5px;">Track your special events and get notified automatically.</p>
+        <h2 style="margin:0;">📅 Calendar</h2>
+        <p class="subtitle" style="margin-top: 2px; font-size: 0.85rem;">Track special events and milestones.</p>
     </div>
 </div>
 
-<div class="calendar-header">
-    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-        <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+<div class="calendar-header" style="margin-bottom: 15px;">
+    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <div style="display: flex; gap: 5px; justify-content: center; align-items: center;">
             <button id="prev-month" class="nav-btn" title="Previous Month">⬅️</button>
-            <select id="month-select" class="clay-input" style="font-size: 1rem; font-weight: bold; padding: 6px 12px; background: var(--bg-color); cursor: pointer; appearance: auto; margin: 0; box-shadow: inset 2px 2px 4px rgba(0,0,0,0.05);"></select>
-            <select id="year-select" class="clay-input" style="font-size: 1rem; font-weight: bold; padding: 6px 12px; background: var(--bg-color); cursor: pointer; appearance: auto; margin: 0; box-shadow: inset 2px 2px 4px rgba(0,0,0,0.05);"></select>
+            <select id="month-select" class="clay-input" style="font-size: 0.9rem; font-weight: bold; padding: 4px 8px; background: var(--bg-color); cursor: pointer; appearance: auto; margin: 0;"></select>
+            <select id="year-select" class="clay-input" style="font-size: 0.9rem; font-weight: bold; padding: 4px 8px; background: var(--bg-color); cursor: pointer; appearance: auto; margin: 0;"></select>
             <button id="next-month" class="nav-btn" title="Next Month">➡️</button>
         </div>
-        <button id="today-btn" class="clay-button" style="padding: 8px 16px; font-size: 0.95rem;">📍 Today</button>
     </div>
-    <button id="add-event-btn" class="clay-button primary" style="padding: 10px 20px; font-size: 1rem; box-shadow: 4px 4px 10px rgba(52,152,219,0.3);">➕ Create Event</button>
+    <button id="add-event-btn" class="clay-button primary" style="padding: 8px 15px; font-size: 0.9rem; box-shadow: 4px 4px 10px rgba(52,152,219,0.3);">➕ Add Event</button>
 </div>
 
 <div class="calendar-grid-header">
@@ -324,7 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const eventsContainer = document.createElement('div');
             eventsContainer.style.flexGrow = "1";
             eventsContainer.style.overflowY = "auto"; 
-            eventsContainer.style.maxHeight = "90px"; 
+            eventsContainer.style.maxHeight = "40px"; 
 
             const dayEvents = eventsData.filter(e => e.date === fullDate || (e.is_annual && e.date.substring(5) === monthDayVal));
             dayEvents.forEach(evt => {
