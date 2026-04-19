@@ -40,8 +40,13 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 # Ensure database tables are created (important for Render/Production)
-with app.app_context():
-    db.create_all()
+try:
+    with app.app_context():
+        db.create_all()
+    print("Database tables initialized successfully.")
+except Exception as db_err:
+    print(f"DATABASE INIT ERROR: {db_err}")
+    # We continue so the app can at least start and give us logs
 
 # Force HTTPS in production
 @app.before_request
