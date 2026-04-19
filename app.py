@@ -1347,6 +1347,10 @@ def robots_txt():
 def sitemap_xml():
     return send_from_directory(app.static_folder, 'sitemap.xml')
 
+@app.route('/googled09f53dc0f297b55.html')
+def google_verification():
+    return send_from_directory(app.static_folder, 'googled09f53dc0f297b55.html')
+
 @app.route('/ads.txt')
 def ads_txt():
     return send_from_directory(app.static_folder, 'ads.txt')
