@@ -316,7 +316,12 @@ def register():
             flash('Email address already exists')
             return redirect(url_for('register'))
 
-        new_user = User(email=email, name=name, nickname=nickname, password=generate_password_hash(password, method='pbkdf2:sha256'))
+        new_user = User(
+            email=email, 
+            name=name, 
+            nickname=nickname, 
+            password=generate_password_hash(password) # Use default high-compat hash
+        )
         db.session.add(new_user)
         db.session.commit()
 
@@ -334,9 +339,14 @@ def login():
         print(f"DEBUG: LOGIN ATTEMPT: {email}")
         user = User.query.filter(db.func.lower(User.email) == email).first()
         
-        if not user or not check_password_hash(user.password, password):
-            print(f"DEBUG: LOGIN FAIL: {'User not found' if not user else 'Password wrong'} for {email}")
-            flash('Please check your login details and try again.')
+        if not user:
+            print(f"DEBUG: LOGIN FAIL - User {email} not found in database.")
+            flash('This email is not registered. Please sign up first!')
+            return redirect(url_for('login'))
+            
+        if not check_password_hash(user.password, password):
+            print(f"DEBUG: LOGIN FAIL - Wrong password for {email}.")
+            flash('Incorrect password. Please try again or reset it.')
             return redirect(url_for('login'))
 
         login_user(user, remember=True)

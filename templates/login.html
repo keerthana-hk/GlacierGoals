@@ -12,8 +12,18 @@
     </div>
 
     <form method="POST" action="{{ url_for('login') }}">
-        <input type="email" name="email" class="clay-input" placeholder="Email Address" required style="margin-bottom: 15px;">
-        <input type="password" name="password" class="clay-input" placeholder="Password" required style="margin-bottom: 5px;">
+        <div style="position: relative; margin-bottom: 15px;">
+            <input type="email" name="email" class="clay-input" placeholder="Email Address" required 
+                style="width: 100%; box-sizing: border-box;" 
+                autocomplete="email" autocapitalize="none" spellcheck="false">
+        </div>
+        
+        <div style="position: relative; margin-bottom: 5px;">
+            <input type="password" id="login-password" name="password" class="clay-input" placeholder="Password" required 
+                style="width: 100%; box-sizing: border-box; padding-right: 40px;" 
+                autocomplete="current-password">
+            <button type="button" onclick="togglePass()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.2rem; opacity: 0.6;">👁️</button>
+        </div>
         
         <div style="text-align: right; margin-bottom: 15px;">
             <a href="{{ url_for('forgot_password') }}" style="font-size: 0.85rem; color: var(--primary); text-decoration: none;">Forgot Password?</a>
@@ -21,6 +31,13 @@
         
         <button type="submit" class="clay-button primary" style="width: 100%; margin-top: 10px;">Login Account</button>
     </form>
+
+    <script>
+    function togglePass() {
+        const p = document.getElementById('login-password');
+        p.type = p.type === 'password' ? 'text' : 'password';
+    }
+    </script>
     
     <p style="margin-top: 20px; font-size: 0.9rem;">
         New to GlacierGoals? <a href="{{ url_for('register') }}" style="color: var(--primary); font-weight: bold;">Create an account</a>
