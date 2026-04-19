@@ -151,8 +151,32 @@
 }
 
 /* Modal form style */
-.form-row {
-    margin-top: 15px;
+/* Mood Picker Styles */
+.mood-emoji-btn {
+    background: var(--clay-bg);
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 15px;
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+    box-shadow: 4px 4px 8px rgba(0,0,0,0.05), -4px -4px 8px rgba(255,255,255,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+}
+.mood-emoji-btn:hover {
+    transform: scale(1.1) translateY(-5px);
+    background: #f0f7ff;
+}
+.mood-emoji-btn:active {
+    transform: scale(0.9);
+}
+.mood-emoji-btn.selected {
+    background: var(--primary);
+    box-shadow: inset 4px 4px 8px rgba(0,0,0,0.1);
 }
 </style>
 
@@ -193,8 +217,22 @@
         <h2 style="margin-top: 0;">How was your day?</h2>
         <p style="color: var(--text-light); margin-bottom: 20px;">Overall Day Review for <span id="review-date-display" style="font-weight:bold;"></span></p>
         
-        <div id="emoji-picker" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 25px; font-size: 2rem; cursor: pointer;">
-            <span style="transition: transform 0.1s;">😫</span><span style="transition: transform 0.1s;">😢</span><span style="transition: transform 0.1s;">😒</span><span style="transition: transform 0.1s;">😐</span><span style="transition: transform 0.1s;">😌</span><span style="transition: transform 0.1s;">😊</span><span style="transition: transform 0.1s;">😍</span><span style="transition: transform 0.1s;">🥳</span><span style="transition: transform 0.1s;">😎</span><span style="transition: transform 0.1s;">🔥</span><span style="transition: transform 0.1s;">🏆</span><span style="transition: transform 0.1s;">🌟</span><span style="transition: transform 0.1s;">😴</span><span style="transition: transform 0.1s;">🤒</span><span style="transition: transform 0.1s;">🍷</span>
+        <div id="emoji-picker" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 25px; padding: 10px;">
+            <button class="mood-emoji-btn">😫</button>
+            <button class="mood-emoji-btn">😢</button>
+            <button class="mood-emoji-btn">😒</button>
+            <button class="mood-emoji-btn">😐</button>
+            <button class="mood-emoji-btn">😌</button>
+            <button class="mood-emoji-btn">😊</button>
+            <button class="mood-emoji-btn">😍</button>
+            <button class="mood-emoji-btn">🥳</button>
+            <button class="mood-emoji-btn">😎</button>
+            <button class="mood-emoji-btn">🔥</button>
+            <button class="mood-emoji-btn">🏆</button>
+            <button class="mood-emoji-btn">🌟</button>
+            <button class="mood-emoji-btn">😴</button>
+            <button class="mood-emoji-btn">🤒</button>
+            <button class="mood-emoji-btn">🍷</button>
         </div>
         
         <div style="display: flex; gap: 15px; margin-top: 20px; border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 20px;">
@@ -457,14 +495,14 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.classList.add('active');
     });
 
-    document.querySelectorAll('#emoji-picker span').forEach(emojiSpan => {
-        emojiSpan.addEventListener('click', async (e) => {
-            const emojiSelected = e.target.innerText;
+    document.querySelectorAll('.mood-emoji-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const emojiSelected = e.currentTarget.innerText;
             const targetDate = document.getElementById('day-review-modal').getAttribute('data-target-date');
             
             // Highlight selected visually
-            document.querySelectorAll('#emoji-picker span').forEach(s => s.style.transform = 'scale(1)');
-            e.target.style.transform = 'scale(1.3)';
+            document.querySelectorAll('.mood-emoji-btn').forEach(b => b.classList.remove('selected'));
+            e.currentTarget.classList.add('selected');
             
             // Post to backend
             const rc = await fetch('/api/calendar/review', {

@@ -288,9 +288,9 @@ body.theme-midnight .hm-day { background: rgba(255,255,255,0.05); }
 .hm-day.done { background: rgba(46, 204, 113, 0.2); color: #27ae60; transform: rotate(-10deg); border: 1px dashed #27ae60; }
 .hm-day.freeze { background: rgba(52, 152, 219, 0.2); }
 
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; z-index: 1000; transition: 0.3s; }
-.modal-overlay.active { opacity: 1; pointer-events: all; }
-.modal { width: 100%; max-width: 400px; transform: translateY(20px); transition: 0.3s; background: var(--bg-color) !important; border: 1px solid rgba(255,255,255,0.5); }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; z-index: 100000; transition: 0.3s; }
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+.modal { width: 90%; max-width: 420px; transform: translateY(20px); transition: 0.3s; background: var(--bg-color) !important; border: 1px solid rgba(255,255,255,0.5); z-index: 100001; }
 .modal-overlay.active .modal { transform: translateY(0); }
 
 .memory-gallery { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; }
