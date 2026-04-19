@@ -407,55 +407,68 @@ body.theme-midnight .hm-day { background: rgba(255,255,255,0.05); }
     .nav-links { display: none !important; }
 /* Responsive Mobile Compaction */
 @media (max-width: 768px) {
+    html { font-size: 14px; }
+    body { font-size: 0.85rem; }
+    
     .hide-mobile { display: none !important; }
     
     .glass-navbar {
         margin: 5px;
-        padding: 5px 12px;
+        padding: 5px 10px;
         border-radius: 12px;
     }
     .logo {
-        font-size: 1.1rem !important;
+        font-size: 1rem !important;
+        letter-spacing: -0.5px;
     }
     .theme-picker {
         gap: 3px !important;
-        padding: 2px 5px !important;
+        padding: 2px 4px !important;
     }
     .theme-btn {
-        width: 18px !important;
-        height: 18px !important;
-        border-width: 2px !important;
+        width: 16px !important;
+        height: 16px !important;
+        border-width: 1.5px !important;
     }
     .header-section {
-        margin-bottom: 10px !important;
-        gap: 5px !important;
+        margin-bottom: 8px !important;
+        gap: 4px !important;
     }
     .header-section h1 {
-        font-size: 1.8rem !important;
+        font-size: 1.6rem !important;
+    }
+    .header-section h2 {
+        font-size: 1.4rem !important;
     }
     .clay-card {
-        padding: 12px !important;
+        padding: 10px !important;
     }
     .container {
-        padding: 0 8px !important;
-        padding-bottom: 80px !important;
+        padding: 0 6px !important;
+        padding-bottom: 70px !important;
     }
     
     /* Stats Bar Compaction */
     #daily-stats-bar {
-        padding: 8px 12px !important;
-        gap: 8px !important;
-        margin-bottom: 15px !important;
+        padding: 6px 10px !important;
+        gap: 6px !important;
+        margin-bottom: 12px !important;
     }
     .xp-today-box {
-        padding: 4px 8px !important;
-        border-radius: 8px !important;
+        padding: 3px 6px !important;
+        border-radius: 6px !important;
     }
     
     .filter-btn {
-        padding: 4px 8px !important;
-        font-size: 0.75rem !important;
+        padding: 3px 6px !important;
+        font-size: 0.7rem !important;
     }
+
+    /* Calendar Mobile Tweak */
+    .calendar-grid { gap: 4px !important; }
+    .calendar-cell { min-height: 40px !important; padding: 2px !important; }
+    .date-number { font-size: 0.75rem !important; }
+    .mood-emoji-btn { width: 50px !important; height: 50px !important; font-size: 1.5rem !important; }
 }
 
 /* Hide mobile bottom nav on Desktop */

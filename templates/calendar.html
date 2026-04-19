@@ -472,10 +472,13 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCalendar();
     });
 
-    document.getElementById('today-btn').addEventListener('click', () => {
-        currentDate = new Date(); // Reset to current device time
-        renderCalendar();
-    });
+    const todayBtn = document.getElementById('today-btn');
+    if(todayBtn) {
+        todayBtn.addEventListener('click', () => {
+            currentDate = new Date(); // Reset to current device time
+            renderCalendar();
+        });
+    }
 
     document.getElementById('add-event-btn').addEventListener('click', () => {
         dateInput.value = ''; // Ensure blank state if pushing Global Add
