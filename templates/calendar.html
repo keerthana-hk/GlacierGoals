@@ -211,33 +211,21 @@
 <!-- The dynamic calendar injects cells here -->
 <div id="calendar-body" class="calendar-grid"></div>
 
-<!-- Day Review Modal -->
-<div id="day-review-modal" class="modal-overlay">
-    <div class="modal clay-card" style="text-align: center;">
-        <h2 style="margin-top: 0;">How was your day?</h2>
-        <p style="color: var(--text-light); margin-bottom: 20px;">Overall Day Review for <span id="review-date-display" style="font-weight:bold;"></span></p>
+<div id="day-review-modal" class="modal-overlay" onclick="closeDayReview(event)">
+    <div class="modal clay-card" style="text-align: center; position: relative;">
+        <button onclick="document.getElementById('day-review-modal').classList.remove('active')" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-light);">✖</button>
+        <h2 style="margin-top: 10px;">How was your day?</h2>
+        <p style="color: var(--text-light); margin-bottom: 20px; font-size: 0.85rem;">Overall Review for <span id="review-date-display" style="font-weight:bold;"></span></p>
         
-        <div id="emoji-picker" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 25px; padding: 10px;">
-            <button class="mood-emoji-btn">😫</button>
-            <button class="mood-emoji-btn">😢</button>
-            <button class="mood-emoji-btn">😒</button>
-            <button class="mood-emoji-btn">😐</button>
-            <button class="mood-emoji-btn">😌</button>
-            <button class="mood-emoji-btn">😊</button>
-            <button class="mood-emoji-btn">😍</button>
-            <button class="mood-emoji-btn">🥳</button>
-            <button class="mood-emoji-btn">😎</button>
-            <button class="mood-emoji-btn">🔥</button>
-            <button class="mood-emoji-btn">🏆</button>
-            <button class="mood-emoji-btn">🌟</button>
-            <button class="mood-emoji-btn">😴</button>
-            <button class="mood-emoji-btn">🤒</button>
-            <button class="mood-emoji-btn">🍷</button>
+        <div id="emoji-picker-container" style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; padding: 10px;">
+            {% for em in ['😫','😢','😒','😐','😌','😊','😍','🥳','😎','🔥','🏆','🌟','😴','🤒','🍷'] %}
+            <button class="mood-emoji-btn" onclick="submitMood('{{ em }}')">{{ em }}</button>
+            {% endfor %}
         </div>
         
-        <div style="display: flex; gap: 15px; margin-top: 20px; border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 20px;">
-            <button id="cancel-review" class="clay-button" style="flex: 1;">Close</button>
-            <button id="open-event-btn" class="clay-button primary" style="flex: 1;">➕ Add Calendar Event</button>
+        <div style="display: flex; gap: 10px; margin-top: 15px; border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 15px;">
+            <button id="cancel-review" class="clay-button" style="flex: 1; font-size: 0.85rem;" onclick="document.getElementById('day-review-modal').classList.remove('active')">Close</button>
+            <button id="open-event-btn" class="clay-button primary" style="flex: 1.5; font-size: 0.85rem;">➕ Calendar Event</button>
         </div>
     </div>
 </div>
@@ -493,27 +481,26 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('day-review-modal').classList.remove('active');
     });
 
-    document.getElementById('open-event-btn').addEventListener('click', () => {
-        document.getElementById('day-review-modal').classList.remove('active');
-        modal.classList.add('active');
-    });
+    // Global Close Helpers
+    window.closeDayReview = function(e) {
+        if(e.target.id === 'day-review-modal') {
+            document.getElementById('day-review-modal').classList.remove('active');
+        }
+    };
 
-    document.querySelectorAll('.mood-emoji-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            const emojiSelected = e.currentTarget.innerText;
-            const targetDate = document.getElementById('day-review-modal').getAttribute('data-target-date');
-            
-            // Highlight selected visually
-            document.querySelectorAll('.mood-emoji-btn').forEach(b => b.classList.remove('selected'));
-            e.currentTarget.classList.add('selected');
-            
-            // Post to backend
-            const rc = await fetch('/api/calendar/review', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({date: targetDate, emoji: emojiSelected})
-            });
-            if(rc.ok) {
+    window.submitMood = function(emojiSelected) {
+        const targetDate = document.getElementById('day-review-modal').getAttribute('data-target-date');
+        const modal = document.getElementById('day-review-modal');
+        
+        // Post to backend
+        fetch('/api/calendar/review', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({date: targetDate, emoji: emojiSelected})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
                 // Update local array and re-render
                 let existing = progData.find(p => p.date === targetDate);
                 if (existing) {
@@ -521,12 +508,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     progData.push({date: targetDate, mood: emojiSelected});
                 }
-                setTimeout(() => {
-                    document.getElementById('day-review-modal').classList.remove('active');
-                    renderCalendar();
-                }, 300);
+                modal.classList.remove('active');
+                renderCalendar();
+            } else {
+                alert("Failed to save mood. Please try again.");
             }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Network error. Please check your connection.");
         });
+    };
+
+    document.getElementById('open-event-btn').addEventListener('click', () => {
+        document.getElementById('day-review-modal').classList.remove('active');
+        const modalEvent = document.getElementById('add-event-modal');
+        modalEvent.classList.add('active');
     });
 });
 </script>
