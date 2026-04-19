@@ -5,4 +5,4 @@ Disallow: /api/
 Disallow: /logout
 Disallow: /instance/
 
-Sitemap: https://glaciergoals.com/sitemap.xml
+Sitemap: https://glaciergoals.onrender.com/sitemap.xml
