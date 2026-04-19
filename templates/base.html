@@ -48,7 +48,31 @@
         }
     </style>
 </head>
-<body>
+<body class="loading-locked">
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('pixelres-theme') || 'theme-glacier';
+            document.body.classList.add(savedTheme);
+        })();
+
+        window.appLogout = function(e) {
+            if (e) e.preventDefault();
+            Swal.fire({
+                title: 'Leaving already? ❄️',
+                text: "Are you ready to log out of GlacierGoals?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#4facfe',
+                cancelButtonColor: '#fe4f6c',
+                confirmButtonText: 'Yes, Logout',
+                customClass: { popup: 'glacier-swal-popup' }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "{{ url_for('logout') }}";
+                }
+            });
+        };
+    </script>
 
 <nav class="glass-navbar">
     <a href="{{ url_for('home') }}" class="logo">
@@ -92,7 +116,7 @@
                 <a href="{{ url_for('calendar_view') }}" class="glass-nav-btn" style="margin-right: 10px; background: rgba(230, 126, 34, 0.2);">📅 Calendar</a>
                 <a href="{{ url_for('longterm') }}" class="glass-nav-btn" style="margin-right: 10px; background: rgba(52, 152, 219, 0.2);">🌍 Yearly Plans</a>
                 <a href="{{ url_for('vault') }}" class="glass-nav-btn" style="margin-right: 10px; background: rgba(155, 89, 182, 0.2);">🔒 Diary Vault</a>
-                <a href="{{ url_for('logout') }}" class="glass-nav-btn" style="background: rgba(0,0,0,0.05);" onclick="return confirm('Are you sure you want to log out?');">Logout</a>
+                <a href="{{ url_for('logout') }}" class="glass-nav-btn logout-trigger" style="background: rgba(0,0,0,0.05);" onclick="appLogout(event)">Logout</a>
             {% else %}
                 {% if request.endpoint not in ['login', 'register', 'forgot_password', 'verify_reset', 'reset_password'] %}
                 <a href="{{ url_for('login') }}" class="glass-nav-btn" style="background: rgba(0,0,0,0.05);">Login</a>
@@ -103,305 +127,129 @@
     </div>
 </nav>
 
-{% if current_user.is_authenticated %}
-<!-- NATIVE APP BOTTOM NAVBAR (Mobile Only) -->
-<nav class="mobile-bottom-nav">
-    <a href="{{ url_for('dashboard') }}" class="mobile-tab {% if request.endpoint == 'dashboard' %}active{% endif %}">
-        <span class="mobile-icon">📅</span>
-        <span>Home</span>
-    </a>
-    <a href="{{ url_for('calendar_view') }}" class="mobile-tab {% if request.endpoint == 'calendar_view' %}active{% endif %}">
-        <span class="mobile-icon">🗓️</span>
-        <span>Calendar</span>
-    </a>
-    <a href="{{ url_for('longterm') }}" class="mobile-tab {% if request.endpoint == 'longterm' %}active{% endif %}">
-        <span class="mobile-icon">🌍</span>
-        <span>Yearly</span>
-    </a>
-    <a href="{{ url_for('vault') }}" class="mobile-tab {% if request.endpoint == 'vault' %}active{% endif %}">
-        <span class="mobile-icon">🔒</span>
-        <span>Vault</span>
-    </a>
-    <a href="#" class="mobile-tab" onclick="appLogout(event)" style="color:#e74c3c">
-        <span class="mobile-icon">🚪</span>
-        <span>Logout</span>
-    </a>
-</nav>
-{% endif %}
-
-<div class="container">
+<div class="container main-content-container">
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="row">
-                <div class="col-12 mt-3">
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show glass-card mb-4" role="alert" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px);">
-                            <span class="me-2">{{ '✨' if category == 'success' else '⚠️' }}</span> {{ message }}
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        {% endif %}
+      {% if messages %}
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+            <script>Swal.fire({ icon: 'error', title: 'Oops...', text: '{{ message }}', customClass: { popup: 'glacier-swal-popup' } });</script>
+          {% else %}
+            <script>Swal.fire({ icon: 'success', title: 'Success!', text: '{{ message }}', timer: 3000, showConfirmButton: false, customClass: { popup: 'glacier-swal-popup' } });</script>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
     {% endwith %}
 
     {% block content %}{% endblock %}
 </div>
 
-<!-- Virtual Avatar UI -->
-{% if current_user.is_authenticated %}
-<div id="glacier-avatar-container" style="position: fixed; bottom: 30px; left: 30px; z-index: 9999;">
-    <!-- Talking Simulator Screen -->
-    <div id="talking-tom-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, rgba(20,40,70,0.85) 0%, rgba(0,10,20,0.98) 100%); backdrop-filter: blur(20px); z-index: 10000; align-items: center; justify-content: center; flex-direction: column;">
-        <button id="close-tom-screen" class="clay-button" style="z-index: 100; position: absolute; top: 30px; right: 30px; background: rgba(30, 58, 138, 0.9); color: white; border: 2px solid rgba(255,255,255,0.8); font-size: 2rem; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(30, 58, 138, 0.4); transition: all 0.3s ease;"><i class="ph-bold ph-x"></i></button>
+<div class="mobile-bottom-nav">
+    <a href="{{ url_for('home') }}" class="nav-item">🏠<span>Home</span></a>
+    <a href="{{ url_for('dashboard') }}" class="nav-item">✅<span>Daily</span></a>
+    <a href="{{ url_for('calendar_view') }}" class="nav-item">📅<span>Calendar</span></a>
+    <a href="{{ url_for('longterm') }}" class="nav-item">🌍<span>Plans</span></a>
+    <a href="{{ url_for('vault') }}" class="nav-item">🔒<span>Diary</span></a>
+</div>
 
-        <div id="live-avatar-wrapper" style="width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 5; display: flex; align-items: center; justify-content: center; background: #e0f2fe; overflow: hidden;">
-            <div style="position: absolute; width: 100%; height: 100%; background: radial-gradient(circle at center, #ffffff 0%, #e0f2fe 100%);"></div>
-            <div id="avatar-container" style="position: relative; width: 100%; height: 100%; max-width: 1000px; max-height: 1000px; display: flex; align-items: center; justify-content: center; z-index: 10;">
-                <svg viewBox="0 0 1000 1000" style="width: 100%; height: 100%; shape-rendering: geometricPrecision;">
-                    <defs>
-                        <filter id="pixelSmear"><feGaussianBlur in="SourceGraphic" stdDeviation="15" /></filter>
-                        <radialGradient id="ghostFade" cx="50%" cy="50%" r="50%">
-                            <stop offset="60%" stop-color="white" stop-opacity="1" />
-                            <stop offset="100%" stop-color="white" stop-opacity="0" />
-                        </radialGradient>
-                        <mask id="beakEraserMask">
-                            <rect width="1000" height="1000" fill="white" />
-                            <circle cx="500" cy="425" r="75" fill="black" />
-                        </mask>
-                        <mask id="smearFadeMask">
-                            <circle cx="500" cy="425" r="85" fill="url(#ghostFade)" />
-                        </mask>
-                    </defs>
-                    <image href="{{ url_for('static', filename='images/blue_penguin_single.png') }}" x="0" y="0" width="1000" height="1000" mask="url(#beakEraserMask)" />
-                    <g mask="url(#smearFadeMask)">
-                        <image href="{{ url_for('static', filename='images/blue_penguin_single.png') }}" x="0" y="0" width="1000" height="1000" filter="url(#pixelSmear)" clip-path="circle(85px at 500px 425px)" />
-                    </g>
-                    <g id="avatar-beak-puppet" style="transition: transform 0.08s ease-out; will-change: transform; transform-origin: 50% 415px;">
-                        <image href="{{ url_for('static', filename='images/blue_penguin_single.png') }}" x="0" y="0" width="1000" height="1000" clip-path="ellipse(55px 40px at 500px 425px)" />
-                    </g>
-                </svg>
-            </div>
-        </div>
-
-        <!-- Controls HUD at the BOTTOM -->
-        <div style="position: absolute; bottom: 50px; left: 0; width: 100%; z-index: 20; display: flex; flex-direction: column; align-items: center; gap: 20px;">
-            <button id="tom-mic-btn" class="clay-button" style="width: 105px; height: 105px; border-radius: 50%; font-size: 3.2rem; background: rgba(124, 77, 255, 0.9); color: white; border: 4px solid white; display: flex; align-items: center; justify-content: center; box-shadow: 0 15px 40px rgba(0,0,0,0.5); backdrop-filter: blur(5px);">
-                <i class="ph-fill ph-microphone"></i>
-            </button>
-            <span id="tom-status-text" style="color: white; font-family: 'Outfit'; font-size: 1.3rem; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">Tap to Converse</span>
+{% if current_user.nickname %}
+<div id="penguin-companion-wrap">
+    <div id="penguin-container">
+        <!-- Penguin Body -->
+        <div class="p-body">
+            <div class="p-tummy"></div>
+            <!-- Eyes -->
+            <div class="p-eye left"><div class="p-pupil"></div></div>
+            <div class="p-eye right"><div class="p-pupil"></div></div>
+            <!-- Beak -->
+            <div class="p-beak"></div>
+            <!-- Mouth for speech -->
+            <div class="p-mouth" id="p-mouth"></div>
+            <!-- Wings -->
+            <div class="p-wing left"></div>
+            <div class="p-wing right"></div>
+            <!-- Feet -->
+            <div class="p-foot left"></div>
+            <div class="p-foot right"></div>
         </div>
     </div>
-
-    <!-- The Floating Corner Avatar Character -->
-    <div id="glacier-avatar-character" style="width: 70px; height: 70px; cursor: pointer; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.3)); animation: floatBounce 3.5s infinite ease-in-out; transition: transform 0.2s; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; overflow: hidden;" title="Talk to me!">
-        <img src="{{ url_for('static', filename='images/penguin_v2.jpg') }}" style="width: 100%; height: 100%; object-fit: cover;">
+    
+    <div id="tom-speech-bubble">
+        <p id="tom-status">Tap to Converse</p>
+        <button id="tom-mic-btn" title="Speak to Tommy">🎙️</button>
     </div>
 </div>
 
-<style>
-@keyframes floatBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-@keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); } 70% { box-shadow: 0 0 0 30px rgba(231, 76, 60, 0); } 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); } }
-.tom-listening { background: #e74c3c !important; animation: pulseGlow 1.5s infinite !important; }
-</style>
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const floatingAvatar = document.getElementById('glacier-avatar-character');
-    const tomScreen = document.getElementById('talking-tom-screen');
-    const closeTomBtn = document.getElementById('close-tom-screen');
     const tomMicBtn = document.getElementById('tom-mic-btn');
-    const avatarContainer = document.getElementById('avatar-container');
-    const beakPuppet = document.getElementById('avatar-beak-puppet');
-    const tomStatus = document.getElementById('tom-status-text');
+    const tomStatus = document.getElementById('tom-status');
+    const mouth = document.getElementById('p-mouth');
     
-    // CRITICAL: Restore synthVoices list so the penguin can speak!
-    let synthVoices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
-    if (window.speechSynthesis) {
-        window.speechSynthesis.onvoiceschanged = () => {
-            synthVoices = window.speechSynthesis.getVoices();
-        };
-    }
-
-    // Advanced Animation State
-    let isSpeaking = false;
     let isListening = false;
-    let mouthInterval;
-    let time = 0;
+    let recognition = null;
+    let silenceTimer = null;
 
-    function renderIdleAnimations() {
-        if(!tomScreen || tomScreen.style.display === 'none') {
-            requestAnimationFrame(renderIdleAnimations);
-            return;
-        }
-        time += 0.05;
-        
-        // Gentle "Breathing" and Head Sway
-        if(avatarContainer && !isSpeaking && !isListening) {
-            const breathing = 1.0 + Math.sin(time) * 0.015;
-            const sway = Math.sin(time * 0.7) * 1.5;
-            avatarContainer.style.transform = `scale(${breathing}) rotate(${sway}deg)`;
-        }
-        
-        requestAnimationFrame(renderIdleAnimations);
-    }
-    renderIdleAnimations(); // start loop
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    function simulateLipSync() {
-        if(!isSpeaking) return;
-        
-        // Natural Jaw Articulation (Stretch downwards from top hinge)
-        if(beakPuppet) {
-            const jawOpen = 1.0 + Math.random() * 0.35; // Scale DOWN
-            beakPuppet.style.transform = `scaleY(${jawOpen})`;
-        }
-        
-        // Small body bounce
-        if(avatarContainer) {
-            const bounce = 1 + Math.random() * 0.02;
-            avatarContainer.style.transform = `scale(${bounce})`;
-        }
-        
-        mouthInterval = setTimeout(simulateLipSync, 40 + Math.random() * 60);
+    function updateMouth(openPercent, duration) {
+        mouth.style.height = (openPercent * 0.1) + 'px';
+        mouth.style.borderRadius = openPercent > 0 ? '50%' : '2px';
     }
 
-    function stopLipSync() {
-        isSpeaking = false;
-        clearTimeout(mouthInterval);
-        if(beakPuppet) beakPuppet.style.transform = 'scaleY(1)';
-        if(avatarContainer) avatarContainer.style.transform = 'scale(1)';
-    }
-
-    if(!floatingAvatar) return;
-
-    floatingAvatar.addEventListener('click', () => {
-        tomScreen.style.display = 'flex';
-        floatingAvatar.style.display = 'none';
-        speak("I'm here! What's on your mind?"); 
-    });
-    
-    closeTomBtn.addEventListener('click', () => {
-        tomScreen.style.display = 'none';
-        floatingAvatar.style.display = 'block';
-        if(window.speechSynthesis) window.speechSynthesis.cancel();
-        if(recognition) recognition.stop();
-        stopLipSync();
-        tomMicBtn.classList.remove('tom-listening');
-        tomStatus.innerText = "Tap to Converse";
-    });
-
-    let chatHistory = [];
-
-    function speak(text) {
-        if(!window.speechSynthesis) return;
-        window.speechSynthesis.cancel();
-        
-        // Strip emojis out so the voice doesn't read out "smiling face with smiling eyes"
-        const cleanText = text.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '');
-        
-        const utterance = new SpeechSynthesisUtterance(cleanText);
-        
-        // Force reload voices exactly when speaking happens to catch delayed loading
-        let currentVoices = window.speechSynthesis.getVoices();
-        if (currentVoices.length === 0) currentVoices = synthVoices;
-
-        // Attempt to find a female voice for maximum cuteness
-        let femaleVoice = currentVoices.find(v => /female|samantha|zira|kathy|siri|hazel|amelia|google uk english female/i.test(v.name));
-        if (femaleVoice) {
-            utterance.voice = femaleVoice;
-        } else if (currentVoices.length > 0) {
-            // Hard fallback to index 1 (usually Zira on Windows if index 0 is David)
-            utterance.voice = currentVoices[1] || currentVoices[0];
-        }
-
-        // Kid Timbre (1.8) + Slow/Clear Rate (0.85)
-        utterance.pitch = 1.8; 
-        utterance.rate = 0.85;
-        
-        utterance.onstart = () => { 
-            isSpeaking = true; 
-            simulateLipSync(); 
-        };
-        utterance.onend = () => { stopLipSync(); };
-        utterance.onerror = () => { stopLipSync(); };
-        
-        window.speechSynthesis.speak(utterance);
+    function animateMouth(text) {
+        let i = 0;
+        const intr = setInterval(() => {
+            if (i >= text.length) {
+                clearInterval(intr);
+                updateMouth(0, 0);
+                return;
+            }
+            updateMouth(Math.random() * 8 + 2, 100);
+            i++;
+        }, 100);
     }
 
     async function sendToAI(text) {
-        tomStatus.innerText = "Thinking...";
-        isSpeaking = false; 
-        if(avatarContainer) avatarContainer.style.transform = "scaleY(0.9) rotate(5deg)"; // Thinking pose
-        
-        chatHistory.push({role: 'user', content: text});
-
         try {
-            const res = await fetch('/api/avatar/chat', {
+            const res = await fetch('/api/chat', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ message: text, history: chatHistory.slice(-10) })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
             });
             const data = await res.json();
-            
-            tomStatus.innerText = "Tap to Converse";
-            
-            if (data.success) {
-                speak(data.reply);
-                chatHistory.push({role: 'model', content: data.reply});
-            } else {
-                // Speak the actual server message (e.g. rate limit notice) instead of generic fallback
-                speak(data.reply || "Sorry, I couldn't connect right now. Please try again.");
+            if (data.reply) {
+                tomStatus.innerText = data.reply;
+                animateMouth(data.reply);
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(data.reply);
+                    utterance.pitch = 1.2;
+                    utterance.rate = 1.0;
+                    window.speechSynthesis.speak(utterance);
+                }
             }
-        } catch(e) {
-            tomStatus.innerText = "Tap to Converse";
-            speak("Oops, I lost connection!");
+        } catch (e) {
+            tomStatus.innerText = "Tommy got a brain freeze! 🧊";
         }
     }
 
-    // Voice Recognition — recreate instance on each use (SpeechRecognition cannot be restarted after it ends)
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
     function createRecognition() {
-        if (!SpeechRecognition) return null;
         const rec = new SpeechRecognition();
-        rec.continuous = true;
+        rec.lang = 'en-US';
         rec.interimResults = true;
-        rec.lang = navigator.language || 'en-US';
-        rec.maxAlternatives = 1;
-
-        let silenceTimer = null;
-        let lastTranscript = '';
+        rec.continuous = false;
 
         rec.onstart = () => {
             isListening = true;
-            lastTranscript = '';
             tomMicBtn.classList.add('tom-listening');
-            tomStatus.innerText = "Listening... Tap Mic when done!";
-            stopLipSync();
-            if (window.speechSynthesis) window.speechSynthesis.cancel();
+            tomStatus.innerText = "Listening... I'm all ears!";
         };
 
-        rec.onresult = (event) => {
-            let interim = '';
-            let final = '';
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const r = event.results[i];
-                if (r.isFinal) {
-                    final += r[0].transcript + ' ';
-                } else {
-                    interim += r[0].transcript;
-                }
-            }
-            
-            // Collect the full story
-            lastTranscript = (lastTranscript + final).trim();
-            const liveText = (lastTranscript + ' ' + interim).trim();
-
+        rec.onresult = (e) => {
+            const liveText = Array.from(e.results).map(r => r[0].transcript).join('');
             if (liveText) {
                 tomStatus.innerText = '🎤 "' + liveText.slice(-40) + '"';
             }
 
-            // PATIENT TIMER: Wait 2.5 seconds before finishing
             clearTimeout(silenceTimer);
             silenceTimer = setTimeout(() => {
                 if (isListening && liveText.length > 2) {
@@ -429,18 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
             isListening = false;
             tomMicBtn.classList.remove('tom-listening');
             console.error("Speech Recognition Error:", e.error);
-
-            const friendlyErrors = {
-                'not-allowed':    "🎤 Microphone access blocked. Allow mic in browser settings.",
-                'no-speech':      "Didn't catch anything. Tap and try again!",
-                'audio-capture':  "No microphone found. Please plug one in.",
-                'network':        "Mic needs internet. Check your connection.",
-                'aborted':        "Tap to Converse",
-            };
-            tomStatus.innerText = friendlyErrors[e.error] || "Tap to try again";
-            if (e.error !== 'not-allowed' && e.error !== 'audio-capture') {
-                setTimeout(() => { tomStatus.innerText = "Tap to Converse"; }, 3000);
-            }
+            tomStatus.innerText = "Tap to try again";
         };
 
         return rec;
@@ -454,28 +291,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tomMicBtn.addEventListener('click', () => {
         if (!SpeechRecognition) return;
-
         if (isListening) {
-            // Stop current session
             if (recognition) recognition.stop();
             return;
         }
-
-        // Always create a fresh instance — SpeechRecognition cannot be restarted after ending
         recognition = createRecognition();
-        if (!recognition) return;
-
-        try {
-            recognition.start();
-        } catch (e) {
-            console.warn("Mic start error:", e);
-            tomStatus.innerText = "Tap to try again";
-            setTimeout(() => { tomStatus.innerText = "Tap to Converse"; }, 2000);
-        }
+        if (recognition) recognition.start();
     });
-
-    // init mouth smile
-    updateMouth(2, 5);
 });
 </script>
 {% endif %}
@@ -483,83 +305,8 @@ document.addEventListener('DOMContentLoaded', () => {
 <script type="module" src="{{ url_for('static', filename='firebase-setup.js') }}"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}?v=12"></script>
 
-{% if current_user.is_authenticated %}
-<style>
-.notif-bell-wrap { position: relative; display: inline-block; }
-.notif-bell-btn {
-    background: rgba(255,255,255,0.2);
-    border: 1.5px solid rgba(255,255,255,0.4);
-    border-radius: 50%;
-    width: 40px; height: 40px;
-    font-size: 18px; cursor: pointer;
-    position: relative;
-    backdrop-filter: blur(10px);
-    transition: transform 0.2s, background 0.2s;
-    display: flex; align-items: center; justify-content: center;
-}
-.notif-bell-btn:hover { transform: scale(1.1); background: rgba(255,255,255,0.35); }
-.notif-badge {
-    position: absolute; top: -4px; right: -4px;
-    background: #e74c3c; color: white;
-    border-radius: 50%; width: 18px; height: 18px;
-    font-size: 10px; font-weight: bold;
-    display: flex; align-items: center; justify-content: center;
-    border: 2px solid white;
-    animation: pulse 1.5s infinite;
-}
-@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
-.notif-panel {
-    display: none;
-    position: absolute; right: 0; top: 50px;
-    background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(20px);
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-    width: 320px; z-index: 9999;
-    border: 1px solid rgba(255,255,255,0.5);
-    overflow: hidden;
-}
-.notif-panel.open { display: block; animation: slideDown 0.2s ease; }
-@keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
-.notif-panel-header {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 14px 16px;
-    background: linear-gradient(135deg, rgba(108,92,231,0.15), rgba(0,184,148,0.15));
-    border-bottom: 1px solid rgba(0,0,0,0.07);
-    font-weight: 700; font-size: 14px; color: #2d3436;
-}
-.notif-mark-btn {
-    background: none; border: 1px solid rgba(108,92,231,0.4);
-    color: #6c5ce7; border-radius: 8px;
-    padding: 3px 8px; font-size: 11px; cursor: pointer;
-    transition: all 0.2s;
-}
-.notif-mark-btn:hover { background: #6c5ce7; color: white; }
-.notif-list { max-height: 350px; overflow-y: auto; }
-.notif-item {
-    display: flex; align-items: flex-start; gap: 10px;
-    padding: 12px 16px;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
-    transition: background 0.15s;
-    position: relative;
-}
-.notif-item:hover { background: rgba(108,92,231,0.05); }
-.notif-item.unread { background: rgba(108,92,231,0.07); }
-.notif-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
-.notif-content { flex: 1; }
-.notif-msg { font-size: 13px; color: #2d3436; line-height: 1.4; }
-.notif-time { font-size: 11px; color: #b2bec3; margin-top: 3px; }
-.notif-del {
-    background: none; border: none; color: #dfe6e9;
-    cursor: pointer; font-size: 16px; flex-shrink: 0;
-    transition: color 0.2s; line-height: 1;
-}
-.notif-del:hover { color: #e74c3c; }
-.notif-empty { padding: 30px 16px; text-align: center; color: #b2bec3; font-size: 13px; }
-</style>
 <script>
 let notifPanelOpen = false;
-
 function toggleNotifPanel() {
     const panel = document.getElementById('notifPanel');
     notifPanelOpen = !notifPanelOpen;
@@ -567,7 +314,6 @@ function toggleNotifPanel() {
     if (notifPanelOpen) loadNotifications();
 }
 
-// Close panel when clicking outside
 document.addEventListener('click', (e) => {
     const wrap = document.getElementById('notifWrap');
     if (wrap && !wrap.contains(e.target) && notifPanelOpen) {
@@ -576,22 +322,6 @@ document.addEventListener('click', (e) => {
     }
 });
 
-function timeAgo(dateParam) {
-    if (!dateParam) return null;
-    const date = typeof dateParam === 'object' ? dateParam : new Date(dateParam);
-    const today = new Date();
-    const seconds = Math.round((today - date) / 1000);
-    const minutes = Math.round(seconds / 60);
-    const hours = Math.round(minutes / 60);
-    const days = Math.round(hours / 24);
-
-    if (seconds < 60) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    if (days < 7) return `${days}d ago`;
-    return date.toLocaleDateString();
-}
-
 async function loadNotifications() {
     try {
         const res = await fetch('/api/notifications');
@@ -599,7 +329,6 @@ async function loadNotifications() {
         const badge = document.getElementById('notifBadge');
         const list = document.getElementById('notifList');
 
-        // Update badge
         if (data.unread > 0) {
             badge.style.display = 'flex';
             badge.textContent = data.unread > 9 ? '9+' : data.unread;
@@ -607,43 +336,23 @@ async function loadNotifications() {
             badge.style.display = 'none';
         }
 
-        // Render notifications
         if (data.notifications.length === 0) {
             list.innerHTML = '<div class="notif-empty">🎉 You\'re all caught up!</div>';
             return;
         }
         list.innerHTML = data.notifications.map(n => `
             <div class="notif-item ${n.is_read ? '' : 'unread'}" id="notif-${n.id}">
-                <span class="notif-icon">${n.icon}</span>
+                <div class="notif-icon">${n.icon || '🔔'}</div>
                 <div class="notif-content">
                     <div class="notif-msg">${n.message}</div>
-                    <div class="notif-time">${timeAgo(n.time)}</div>
                 </div>
-                <button class="notif-del" onclick="deleteNotif(${n.id})" title="Dismiss">×</button>
             </div>
         `).join('');
-    } catch(e) { console.error('Notifications error:', e); }
+    } catch (e) {
+        console.error('Failed to load notifications');
+    }
 }
 
-async function markAllRead() {
-    await fetch('/api/notifications/mark-read', { method: 'POST' });
-    loadNotifications();
-}
-
-async function deleteNotif(id) {
-    await fetch(`/api/notifications/${id}/delete`, { method: 'POST' });
-    const el = document.getElementById('notif-' + id);
-    if (el) { el.style.opacity = '0'; setTimeout(() => el.remove(), 200); }
-    loadNotifications();
-}
-
-// Poll every 30 seconds for new notifications
-loadNotifications();
-setInterval(loadNotifications, 30000);
-</script>
-{% endif %}
-<script>
-// ─── SERVICE WORKER + PUSH NOTIFICATIONS ────────────────────────────────────
 function urlB64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -664,7 +373,6 @@ async function subscribeToPushNotifications(registration) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(sub)
         });
-        console.log('✅ GlacierGoals: Push notifications activated!');
     } catch(e) {
         console.log('Push subscription skipped:', e.message);
     }
@@ -674,46 +382,19 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', async function() {
         try {
             const registration = await navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}");
-            console.log('ServiceWorker registered:', registration.scope);
-            
             {% if current_user.is_authenticated %}
-            // Only ask for permission if user is logged in
             if ('PushManager' in window && Notification.permission === 'default') {
                 const permission = await Notification.requestPermission();
-                if (permission === 'granted') {
-                    await subscribeToPushNotifications(registration);
-                }
-            } else if ('PushManager' in window && Notification.permission === 'granted') {
-                // Already granted — silently re-subscribe (handles new devices)
-                const existingSub = await registration.pushManager.getSubscription();
-                if (!existingSub) {
-                    await subscribeToPushNotifications(registration);
-                }
+                if (permission === 'granted') await subscribeToPushNotifications(registration);
             }
             {% endif %}
         } catch(err) {
             console.log('ServiceWorker error:', err);
         }
     });
-    window.appLogout = function(e) {
-        e.preventDefault();
-        Swal.fire({
-            title: 'Leaving already? ❄️',
-            text: "Are you ready to log out of GlacierGoals?",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#4facfe',
-            cancelButtonColor: '#fe4f6c',
-            confirmButtonText: 'Yes, Logout',
-            customClass: { popup: 'glacier-swal-popup' }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = "{{ url_for('logout') }}";
-            }
-        });
-    };
 }
 </script>
+
 <footer style="margin-top: 50px; padding: 20px; text-align: center; color: rgba(255,255,255,0.4); font-size: 0.85rem;">
     <div style="margin-bottom: 10px;">
         <a href="{{ url_for('privacy_policy') }}" style="color: rgba(255,255,255,0.6); text-decoration: none; margin: 0 10px;">Privacy Policy</a>
