@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="header-section">
+    <div>
+        <h1>🌍 Yearly Bucket List</h1>
+        <p class="subtitle">Plan your biggest moves for 2026 and beyond.</p>
+    </div>
+    <button id="add-longterm-btn" class="clay-button primary">➕ Add Goal</button>
+</div>
+
+<div class="resolution-list">
+    {% for goal in goals %}
+    <div class="res-item clay-card" style="display: flex; flex-direction: column; min-height: 200px; position: relative;">
+        <!-- Priority Ribbon -->
+        {% if goal.priority == 'High' %}
+        <div style="position: absolute; top: -10px; right: -10px; background: #e74c3c; color: white; padding: 5px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; box-shadow: 0 4px 10px rgba(231, 76, 60, 0.4);">High Priority</div>
+        {% elif goal.priority == 'Medium' %}
+        <div style="position: absolute; top: -10px; right: -10px; background: #f39c12; color: white; padding: 5px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; box-shadow: 0 4px 10px rgba(243, 156, 18, 0.4);">Medium Priority</div>
+        {% elif goal.priority == 'Low' %}
+        <div style="position: absolute; top: -10px; right: -10px; background: #95a5a6; color: white; padding: 5px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; box-shadow: 0 4px 10px rgba(149, 165, 166, 0.4);">Low Priority</div>
+        {% endif %}
+
+        <div class="res-header">
+            <div class="res-info" style="width: 100%;">
+                <h3 class="user-generated-text" style="font-size: 1.8rem; margin: 0 0 10px 0; color: var(--text-dark);">{{ goal.title }}</h3>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <span class="category-badge" style="background: var(--primary); color: white;">Target: {{ goal.target_year if goal.target_year else 'Future' }}</span>
+                    <span class="category-badge" style="background: #3498db; color: white;">{{ goal.category }}</span>
+                    {% if goal.budget %}
+                    <span class="category-badge" style="background: #2ecc71; color: white;">💵 Budget: ${{ "%.2f"|format(goal.budget|default(0, true)) }}</span>
+                    {% endif %}
+                    {% if goal.reward %}
+                    <span class="category-badge" style="background: #9b59b6; color: white;">🎁 Reward: {{ goal.reward }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <p style="margin: 15px 0 20px 0; color: var(--text-light); font-size: 1rem; flex-grow: 1; line-height: 1.5;">
+            {{ goal.description }}
+        </p>
+
+        <!-- Sub-tasks Section -->
+        <div style="background: rgba(255, 255, 255, 0.4); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+            <h4 style="margin: 0 0 10px 0; font-size: 1rem;">Milestones / Sub-tasks:</h4>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                {% for step in goal.steps %}
+                <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 8px 12px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <form action="{{ url_for('toggle_longterm_step', step_id=step.id) }}" method="POST" style="margin: 0;">
+                            <input type="checkbox" onChange="this.form.submit()" {% if step.is_completed %}checked{% endif %} style="cursor: pointer;">
+                        </form>
+                        <span style="{% if step.is_completed %}text-decoration: line-through; color: #999;{% endif %}">{{ step.title }}</span>
+                    </div>
+                    <form action="{{ url_for('delete_longterm_step', step_id=step.id) }}" method="POST" style="margin: 0;">
+                        <button type="submit" style="background: none; border: none; color: #e74c3c; cursor: pointer;" title="Delete step">❌</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <form action="{{ url_for('add_longterm_step', goal_id=goal.id) }}" method="POST" style="margin: 10px 0 0 0; display: flex; gap: 8px;">
+                <input type="text" name="title" class="clay-input" placeholder="Add a new step..." style="padding: 8px; flex: 1; font-size: 0.9rem;" required>
+                <button type="submit" class="clay-button primary" style="padding: 8px 15px; font-size: 0.9rem;">Add</button>
+            </form>
+        </div>
+
+        <div class="res-actions" style="margin-top: 0; border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+            <form action="{{ url_for('complete_longterm', goal_id=goal.id) }}" method="POST" style="margin: 0;">
+                <button type="submit" class="clay-button" style="background: {{ '#2ecc71' if goal.is_completed else 'var(--bg-color)' }}; color: {{ 'white' if goal.is_completed else 'var(--text-dark)' }}; padding: 8px 15px; font-size: 0.9rem;">
+                    {{ '✅ Achieved!' if goal.is_completed else 'Mark Achieved' }}
+                </button>
+            </form>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button type="button" class="clay-button btn-edit-goal" data-id="{{ goal.id }}" style="padding: 8px 12px; display: flex; align-items: center; justify-content: center;" title="Edit Goal"><i class="ph-bold ph-pencil-simple" style="font-size: 1.1rem; color: #f39c12;"></i></button>
+                <form action="{{ url_for('delete_longterm', goal_id=goal.id) }}" method="POST" style="margin: 0;">
+                    <button type="submit" class="btn-delete" title="Delete Goal" onclick="return confirm('Delete this bucket list item?');" style="padding: 8px 12px; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-trash" style="font-size: 1.1rem;"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Modal for {{ goal.title }} -->
+    <div id="edit-goal-modal-{{ goal.id }}" class="modal-overlay">
+        <div class="modal clay-card">
+            <h2 style="margin-top: 0;">Edit Bucket Goal 🌍</h2>
+            <form method="POST" action="{{ url_for('edit_longterm', goal_id=goal.id) }}">
+                <input type="text" name="title" class="clay-input" value="{{ goal.title }}" required>
+                <textarea name="description" class="clay-input" style="resize: vertical; min-height: 80px;">{{ goal.description }}</textarea>
+                
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <input type="number" name="target_year" class="clay-input" value="{{ goal.target_year if goal.target_year else '' }}" placeholder="Target Year" style="flex: 1;">
+                    <select name="priority" class="clay-input" style="flex: 1;">
+                        <option value="Low" {% if goal.priority == 'Low' %}selected{% endif %}>Low Priority</option>
+                        <option value="Medium" {% if goal.priority == 'Medium' %}selected{% endif %}>Medium Priority</option>
+                        <option value="High" {% if goal.priority == 'High' %}selected{% endif %}>High Priority</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <select name="category" class="clay-input" style="flex: 1;">
+                        <option value="General" {% if goal.category == 'General' %}selected{% endif %}>General</option>
+                        <option value="Travel ✈️" {% if goal.category == 'Travel ✈️' %}selected{% endif %}>Travel ✈️</option>
+                        <option value="Finance 💰" {% if goal.category == 'Finance 💰' %}selected{% endif %}>Finance 💰</option>
+                        <option value="Health 🏃" {% if goal.category == 'Health 🏃' %}selected{% endif %}>Health 🏃</option>
+                        <option value="Career 📈" {% if goal.category == 'Career 📈' %}selected{% endif %}>Career 📈</option>
+                    </select>
+                    <input type="number" step="0.01" name="budget" class="clay-input" value="{{ "%.2f"|format(goal.budget) if goal.budget else '' }}" placeholder="Budget/Cost" style="flex: 1;">
+                </div>
+                
+                <input type="text" name="reward" class="clay-input" value="{{ goal.reward }}" placeholder="Reward upon completion 🎁" style="margin-bottom: 10px;">
+
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="button" class="clay-button cancel-edit-btn" data-id="{{ goal.id }}" style="flex: 1;">Cancel</button>
+                    <button type="submit" class="clay-button primary" style="flex: 2;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <div class="clay-card" style="grid-column: 1 / -1; text-align: center; padding: 50px;">
+        <h3>No bucket list goals yet! 🌟</h3>
+        <p style="color: var(--text-light);">Start planning your next big adventure, home purchase, or career milestone.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Add Modal -->
+<div id="add-longterm-modal" class="modal-overlay">
+    <div class="modal clay-card">
+        <h2 style="margin-top: 0;">New Bucket Goal 🌍</h2>
+        <form method="POST" action="{{ url_for('longterm') }}">
+            <input type="text" name="title" class="clay-input" placeholder="E.g., Buy a new car" required>
+            <textarea name="description" class="clay-input" placeholder="Details (Budget, model, etc.)" style="resize: vertical; min-height: 80px;"></textarea>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <input type="number" name="target_year" class="clay-input" placeholder="Target Year (e.g., 2026)" value="2026" style="flex: 1;">
+                <select name="priority" class="clay-input" style="flex: 1;">
+                    <option value="Low">Low Priority</option>
+                    <option value="Medium" selected>Medium Priority</option>
+                    <option value="High">High Priority</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <select name="category" class="clay-input" style="flex: 1;">
+                    <option value="General" selected>General</option>
+                    <option value="Travel ✈️">Travel ✈️</option>
+                    <option value="Finance 💰">Finance 💰</option>
+                    <option value="Health 🏃">Health 🏃</option>
+                    <option value="Career 📈">Career 📈</option>
+                </select>
+                <input type="number" step="0.01" name="budget" class="clay-input" placeholder="Cost / Budget" style="flex: 1;">
+            </div>
+            
+            <input type="text" name="reward" class="clay-input" placeholder="Reward upon completion 🎁" style="margin-bottom: 10px;">
+            
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button type="button" id="cancel-longterm-add" class="clay-button" style="flex: 1;">Cancel</button>
+                <button type="submit" class="clay-button primary" style="flex: 2;">Save Goal</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const addBtn = document.getElementById('add-longterm-btn');
+    const overlay = document.getElementById('add-longterm-modal');
+    const cancelBtn = document.getElementById('cancel-longterm-add');
+    
+    if(addBtn) addBtn.addEventListener('click', () => overlay.classList.add('active'));
+    if(cancelBtn) cancelBtn.addEventListener('click', () => overlay.classList.remove('active'));
+
+    // Edit logic
+    document.querySelectorAll('.btn-edit-goal').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = btn.getAttribute('data-id');
+            document.getElementById('edit-goal-modal-' + id).classList.add('active');
+        });
+    });
+
+    document.querySelectorAll('.cancel-edit-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = btn.getAttribute('data-id');
+            document.getElementById('edit-goal-modal-' + id).classList.remove('active');
+        });
+    });
+});
+</script>
+{% endblock %}

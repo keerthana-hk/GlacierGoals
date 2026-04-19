@@ -1,0 +1,16 @@
+{
+  "name": "GlacierGoals - Habit Tracker",
+  "short_name": "GlacierGoals",
+  "description": "Your ultimate resolution and habit tracker with an AI companion.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a1e32",
+  "theme_color": "#0a1e32",
+  "icons": [
+    {
+      "src": "/static/images/penguin_v2.jpg",
+      "sizes": "192x192 512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

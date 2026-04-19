@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="glass-card" style="max-width: 800px; margin: 40px auto; padding: 40px; color: white; line-height: 1.6;">
+    <h1 style="color: #64ffda; margin-bottom: 20px;"><i class="ph-bold ph-shield-check"></i> Privacy Policy</h1>
+    <p style="opacity: 0.8; margin-bottom: 30px;">Last Updated: April 18, 2026</p>
+
+    <section style="margin-bottom: 25px;">
+        <h2 style="color: #fff; font-size: 1.4rem;">1. Information We Collect</h2>
+        <p>At GlacierGoals, we collect information to help you track your resolutions and provide an empathetic AI experience. This includes:</p>
+        <ul>
+            <li>Account Information: Name and password used for login.</li>
+            <li>Usage Data: Interaction with the AI Penguin and habit completion data.</li>
+            <li>Diary Entries: Private thoughts stored in your "Secret Vault".</li>
+        </ul>
+    </section>
+
+    <section style="margin-bottom: 25px;">
+        <h2 style="color: #fff; font-size: 1.4rem;">2. How We Use Your Data</h2>
+        <p>Your data is used solely to provide and improve the services offered by GlacierGoals. Specifically:</p>
+        <ul>
+            <li>To personalize your AI interaction.</li>
+            <li>To track and visualize your progress over time.</li>
+            <li>To send reminders and notifications about your goals.</li>
+        </ul>
+    </section>
+
+    <section style="margin-bottom: 25px;">
+        <h2 style="color: #fff; font-size: 1.4rem;">3. Data Security</h2>
+        <p>We prioritize the security of your data. Your "Secret Vault" entries are protected and are not used for training AI models without explicit permission. We use industry-standard encryption to protect your account information.</p>
+    </section>
+
+    <section style="margin-bottom: 25px;">
+        <h2 style="color: #fff; font-size: 1.4rem;">4. Third-Party Services</h2>
+        <p>We use reputable third-party services such as Groq for AI processing and Firebase for cloud notifications. These services may process data according to their own privacy policies.</p>
+    </section>
+
+    <section>
+        <h2 style="color: #fff; font-size: 1.4rem;">5. Contact Us</h2>
+        <p>If you have questions about this Privacy Policy, please contact us through the app feedback section.</p>
+    </section>
+
+    <div style="margin-top: 40px; text-align: center;">
+        <a href="{{ url_for('home') }}" class="glass-nav-btn" style="text-decoration: none; padding: 12px 25px;">Back to Home</a>
+    </div>
+</div>
+
+<style>
+    ul { margin-left: 20px; margin-top: 10px; }
+    li { margin-bottom: 8px; opacity: 0.9; }
+</style>
+{% endblock %}

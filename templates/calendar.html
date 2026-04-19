@@ -1,0 +1,493 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+/* Calendar Grid & Google-Calendar-style aesthetics */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+.calendar-grid-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 15px;
+    margin-bottom: 15px;
+}
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+.day-header-lbl {
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.calendar-cell {
+    background: var(--clay-bg);
+    min-height: 90px;
+    border-radius: 10px;
+    padding: 8px;
+    box-shadow: inset 2px 2px 5px rgba(255,255,255,0.8), 6px 6px 12px rgba(0,0,0,0.04);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    position: relative;
+    border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+}
+.calendar-cell:hover {
+    transform: translateY(-4px);
+    box-shadow: inset 2px 2px 5px rgba(255,255,255,0.8), 8px 8px 16px rgba(0,0,0,0.08);
+    border-color: rgba(52, 152, 219, 0.4);
+}
+.calendar-cell.today {
+    background: #f0f7ff;
+    border: 2px solid #3498db;
+}
+.date-number {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text-color);
+    margin-bottom: 8px;
+    display: inline-block;
+}
+.calendar-cell.today .date-number {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    box-shadow: 2px 2px 6px rgba(52, 152, 219, 0.4);
+}
+.event-badge {
+    background: rgba(241, 196, 15, 0.2);
+    color: #b9770e;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.03);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid #f1c40f;
+    transition: all 0.2s;
+}
+.event-badge:hover {
+    background: rgba(241, 196, 15, 0.35);
+}
+.event-badge button.delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 0 4px;
+    margin-left: 5px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.event-badge:hover button.delete-btn {
+    opacity: 0.8;
+}
+.event-badge button.delete-btn:hover {
+    opacity: 1;
+    color: red;
+}
+.nav-btn {
+    background: var(--clay-bg);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    box-shadow: 4px 4px 8px rgba(0,0,0,0.05), -4px -4px 8px rgba(255,255,255,0.8);
+    transition: all 0.2s;
+}
+.nav-btn:hover {
+    background: #eaf0f6;
+    transform: scale(1.05);
+}
+.calendar-cell.empty {
+    visibility: hidden;
+}
+
+/* Mood Chips for the Calendar */
+.mood-chip-container {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-top: auto; 
+    padding-top: 5px;
+}
+.mood-chip {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 2;
+}
+.calendar-cell:hover .mood-chip {
+    transform: scale(1.3);
+}
+
+/* Modal form style */
+.form-row {
+    margin-top: 15px;
+}
+</style>
+
+<div class="header-section" style="margin-bottom: 0;">
+    <div>
+        <h1 style="margin:0;">📅 My Calendar</h1>
+        <p class="subtitle" style="margin-top: 5px;">Track your special events and get notified automatically.</p>
+    </div>
+</div>
+
+<div class="calendar-header">
+    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+        <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+            <button id="prev-month" class="nav-btn" title="Previous Month">⬅️</button>
+            <select id="month-select" class="clay-input" style="font-size: 1rem; font-weight: bold; padding: 6px 12px; background: var(--bg-color); cursor: pointer; appearance: auto; margin: 0; box-shadow: inset 2px 2px 4px rgba(0,0,0,0.05);"></select>
+            <select id="year-select" class="clay-input" style="font-size: 1rem; font-weight: bold; padding: 6px 12px; background: var(--bg-color); cursor: pointer; appearance: auto; margin: 0; box-shadow: inset 2px 2px 4px rgba(0,0,0,0.05);"></select>
+            <button id="next-month" class="nav-btn" title="Next Month">➡️</button>
+        </div>
+        <button id="today-btn" class="clay-button" style="padding: 8px 16px; font-size: 0.95rem;">📍 Today</button>
+    </div>
+    <button id="add-event-btn" class="clay-button primary" style="padding: 10px 20px; font-size: 1rem; box-shadow: 4px 4px 10px rgba(52,152,219,0.3);">➕ Create Event</button>
+</div>
+
+<div class="calendar-grid-header">
+    <div class="day-header-lbl">Sun</div>
+    <div class="day-header-lbl">Mon</div>
+    <div class="day-header-lbl">Tue</div>
+    <div class="day-header-lbl">Wed</div>
+    <div class="day-header-lbl">Thu</div>
+    <div class="day-header-lbl">Fri</div>
+    <div class="day-header-lbl">Sat</div>
+</div>
+<!-- The dynamic calendar injects cells here -->
+<div id="calendar-body" class="calendar-grid"></div>
+
+<!-- Day Review Modal -->
+<div id="day-review-modal" class="modal-overlay">
+    <div class="modal clay-card" style="text-align: center;">
+        <h2 style="margin-top: 0;">How was your day?</h2>
+        <p style="color: var(--text-light); margin-bottom: 20px;">Overall Day Review for <span id="review-date-display" style="font-weight:bold;"></span></p>
+        
+        <div id="emoji-picker" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 25px; font-size: 2rem; cursor: pointer;">
+            <span style="transition: transform 0.1s;">😫</span><span style="transition: transform 0.1s;">😢</span><span style="transition: transform 0.1s;">😒</span><span style="transition: transform 0.1s;">😐</span><span style="transition: transform 0.1s;">😌</span><span style="transition: transform 0.1s;">😊</span><span style="transition: transform 0.1s;">😍</span><span style="transition: transform 0.1s;">🥳</span><span style="transition: transform 0.1s;">😎</span><span style="transition: transform 0.1s;">🔥</span><span style="transition: transform 0.1s;">🏆</span><span style="transition: transform 0.1s;">🌟</span><span style="transition: transform 0.1s;">😴</span><span style="transition: transform 0.1s;">🤒</span><span style="transition: transform 0.1s;">🍷</span>
+        </div>
+        
+        <div style="display: flex; gap: 15px; margin-top: 20px; border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 20px;">
+            <button id="cancel-review" class="clay-button" style="flex: 1;">Close</button>
+            <button id="open-event-btn" class="clay-button primary" style="flex: 1;">➕ Add Calendar Event</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div id="add-event-modal" class="modal-overlay">
+    <div class="modal clay-card">
+        <h2 style="margin-top: 0; display:flex; align-items: center; gap: 10px;">📅 New Event</h2>
+        <p style="color: var(--text-light); margin-bottom: 20px;">Save the date to get a reminder.</p>
+        <form method="POST" action="{{ url_for('calendar_view') }}">
+            
+            <div class="form-row">
+                <input type="text" name="title" class="clay-input" placeholder="Event Name (e.g., Mom's Birthday, Concert)" required>
+            </div>
+            <div class="form-row">
+                <input type="date" id="event-date-input" name="date" class="clay-input" required>
+            </div>
+            <div class="form-row" style="display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" name="is_annual" id="is_annual" style="width: 20px; height: 20px; cursor: pointer;">
+                <label for="is_annual" style="color: var(--text-color); cursor: pointer; font-weight: bold;">Repeats Annually (e.g. Birthdays)</label>
+            </div>
+            
+            <div style="display: flex; gap: 15px; margin-top: 30px;">
+                <button type="button" id="cancel-event-add" class="clay-button" style="flex: 1;">Cancel</button>
+                <button type="submit" class="clay-button primary" style="flex: 2;">Save Event</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Invisible forms for event deletion -->
+<div id="delete-forms" style="display: none;">
+    {% for e in events %}
+    <form id="delete-form-{{ e.id }}" action="{{ url_for('delete_event', event_id=e.id) }}" method="POST"></form>
+    {% endfor %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Inject backend data directly into JS using Jinja parsing logic
+    const eventsData = [
+        {% for e in events %}
+            { id: {{ e.id }}, title: "{{ e.title | replace('"', '\\"') }}", date: "{{ e.date }}", is_annual: {{ 'true' if e.is_annual else 'false' }} }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    const progData = {{ prog_data | tojson | safe }};
+
+    let currentDate = new Date(); 
+    
+    const calBody = document.getElementById('calendar-body');
+    const monthSelect = document.getElementById('month-select');
+    const yearSelect = document.getElementById('year-select');
+    const dateInput = document.getElementById('event-date-input');
+    const modal = document.getElementById('add-event-modal');
+    
+    // Initialize Year & Month Options
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    monthNames.forEach((monthStr, index) => {
+        let opt = document.createElement('option');
+        opt.value = index;
+        opt.text = monthStr;
+        monthSelect.appendChild(opt);
+    });
+    
+    for(let y = 1990; y <= 2100; y++) {
+        let opt = document.createElement('option');
+        opt.value = y;
+        opt.text = y;
+        yearSelect.appendChild(opt);
+    }
+
+    function renderCalendar() {
+        calBody.innerHTML = ''; // Wipe and redraw entirely
+        
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth(); 
+        
+        // Sync Dropdowns dynamically
+        monthSelect.value = month;
+        yearSelect.value = year;
+        
+        // Setup Grid variables
+        const firstDay = new Date(year, month, 1).getDay(); // Sunday=0
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        // Track the actual current time / day in the real world
+        const todayReal = new Date();
+        const isCurrentMonth = todayReal.getFullYear() === year && todayReal.getMonth() === month;
+        const currentDay = todayReal.getDate();
+
+        // 1. Generate invisible padding-cells to push the 1st of the month to the correct weekday column
+        for(let i = 0; i < firstDay; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'calendar-cell empty';
+            calBody.appendChild(cell);
+        }
+
+        // 2. Generate actual numbered calendar days
+        for(let d = 1; d <= daysInMonth; d++) {
+            const cell = document.createElement('div');
+            cell.className = 'calendar-cell';
+            
+            // Highlight today
+            if (isCurrentMonth && d === currentDay) {
+                cell.classList.add('today');
+            }
+            
+            // Build absolute Date String matching DB (YYYY-MM-DD)
+            const mStr = (month + 1).toString().padStart(2, '0');
+            const dStr = d.toString().padStart(2, '0');
+            const fullDate = `${year}-${mStr}-${dStr}`;
+            const monthDayVal = `${mStr}-${dStr}`;
+            
+            const header = document.createElement('span');
+            header.className = 'date-number';
+            header.innerText = d;
+            cell.appendChild(header);
+
+            // Container specifically for scrolling overflowed events inside the cell 
+            const eventsContainer = document.createElement('div');
+            eventsContainer.style.flexGrow = "1";
+            eventsContainer.style.overflowY = "auto"; 
+            eventsContainer.style.maxHeight = "90px"; 
+
+            const dayEvents = eventsData.filter(e => e.date === fullDate || (e.is_annual && e.date.substring(5) === monthDayVal));
+            dayEvents.forEach(evt => {
+                const badge = document.createElement('div');
+                badge.className = 'event-badge';
+                
+                // Show years elapsed if it's an annual event from the past
+                let elapsedText = "";
+                if(evt.is_annual && evt.date !== fullDate) {
+                    const evtYear = parseInt(evt.date.substring(0,4));
+                    if(year > evtYear) {
+                        elapsedText = ` (${year - evtYear} yrs)`;
+                        badge.style.background = 'rgba(46, 204, 113, 0.2)'; /* Greenish tint for repeating milestone */
+                        badge.style.borderLeftColor = '#2ecc71';
+                        badge.style.color = '#27ae60';
+                    }
+                }
+                
+                const titleSpan = document.createElement('span');
+                titleSpan.innerText = evt.title + elapsedText;
+                titleSpan.title = evt.title + elapsedText;
+                titleSpan.style.overflow = "hidden";
+                titleSpan.style.textOverflow = "ellipsis";
+                
+                const delBtn = document.createElement('button');
+                delBtn.className = 'delete-btn';
+                delBtn.innerText = '✖';
+                delBtn.title = 'Remove Event';
+                delBtn.onclick = (e) => {
+                    e.stopPropagation(); // Stops the modal from being opened when clicking delete
+                    if(confirm(`Remove "${evt.title}" from your calendar?`)) {
+                        document.getElementById('delete-form-' + evt.id).submit();
+                    }
+                };
+
+                badge.appendChild(titleSpan);
+                badge.appendChild(delBtn);
+                eventsContainer.appendChild(badge);
+            });
+
+            cell.appendChild(eventsContainer);
+
+            // Add Mood Chips
+            const dayProgs = progData.filter(p => p.date === fullDate);
+            if(dayProgs.length > 0) {
+                const chipContainer = document.createElement('div');
+                chipContainer.className = 'mood-chip-container';
+                
+                dayProgs.forEach(prog => {
+                    const chip = document.createElement('div');
+                    chip.className = 'mood-chip';
+                    chip.innerText = prog.mood;
+                    chipContainer.appendChild(chip);
+                    
+                    // Interaction: Day glows!
+                    let glowColor = "rgba(255, 223, 186, 0.3)"; // Default warm glow
+                    if(prog.mood === '💪') glowColor = "rgba(186, 225, 255, 0.3)";
+                    else if(prog.mood === '🥱') glowColor = "rgba(220, 220, 220, 0.3)";
+                    else if(prog.mood === '😊' || prog.mood === '😍') glowColor = "rgba(255, 179, 186, 0.3)";
+                    else if(prog.mood === '✨') glowColor = "rgba(255, 255, 186, 0.3)";
+                    
+                    cell.addEventListener('mouseenter', () => {
+                        cell.style.boxShadow = `0 0 15px 5px ${glowColor}, inset 2px 2px 5px rgba(255,255,255,0.8)`;
+                        cell.style.backgroundColor = glowColor;
+                    });
+                    cell.addEventListener('mouseleave', () => {
+                        cell.style.boxShadow = '';
+                        cell.style.backgroundColor = '';
+                    });
+                });
+                cell.appendChild(chipContainer);
+            }
+
+            // If a cell itself is clicked, open the Day Review modal focused purely on this specific date
+            cell.onclick = () => {
+                dateInput.value = fullDate;
+                document.getElementById('review-date-display').innerText = fullDate;
+                document.getElementById('day-review-modal').setAttribute('data-target-date', fullDate);
+                document.getElementById('day-review-modal').classList.add('active');
+            };
+
+            calBody.appendChild(cell);
+        }
+    }
+
+    // Call Immediately
+    renderCalendar();
+
+    // Dropdown Listeners
+    monthSelect.addEventListener('change', () => {
+        currentDate.setMonth(parseInt(monthSelect.value));
+        renderCalendar();
+    });
+
+    yearSelect.addEventListener('change', () => {
+        currentDate.setFullYear(parseInt(yearSelect.value));
+        renderCalendar();
+    });
+
+    // Attach Button Listeners
+    document.getElementById('prev-month').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    });
+
+    document.getElementById('next-month').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    });
+
+    document.getElementById('today-btn').addEventListener('click', () => {
+        currentDate = new Date(); // Reset to current device time
+        renderCalendar();
+    });
+
+    document.getElementById('add-event-btn').addEventListener('click', () => {
+        dateInput.value = ''; // Ensure blank state if pushing Global Add
+        modal.classList.add('active');
+    });
+
+    document.getElementById('cancel-event-add').addEventListener('click', () => {
+        modal.classList.remove('active');
+    });
+
+    document.getElementById('cancel-review').addEventListener('click', () => {
+        document.getElementById('day-review-modal').classList.remove('active');
+    });
+
+    document.getElementById('open-event-btn').addEventListener('click', () => {
+        document.getElementById('day-review-modal').classList.remove('active');
+        modal.classList.add('active');
+    });
+
+    document.querySelectorAll('#emoji-picker span').forEach(emojiSpan => {
+        emojiSpan.addEventListener('click', async (e) => {
+            const emojiSelected = e.target.innerText;
+            const targetDate = document.getElementById('day-review-modal').getAttribute('data-target-date');
+            
+            // Highlight selected visually
+            document.querySelectorAll('#emoji-picker span').forEach(s => s.style.transform = 'scale(1)');
+            e.target.style.transform = 'scale(1.3)';
+            
+            // Post to backend
+            const rc = await fetch('/api/calendar/review', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({date: targetDate, emoji: emojiSelected})
+            });
+            if(rc.ok) {
+                // Update local array and re-render
+                let existing = progData.find(p => p.date === targetDate);
+                if (existing) {
+                    existing.mood = emojiSelected;
+                } else {
+                    progData.push({date: targetDate, mood: emojiSelected});
+                }
+                setTimeout(() => {
+                    document.getElementById('day-review-modal').classList.remove('active');
+                    renderCalendar();
+                }, 300);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

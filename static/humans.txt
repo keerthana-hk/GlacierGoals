@@ -1,0 +1,14 @@
+/* TEAM */
+    Developer: Keerthana H K
+    Twitter: @yourhandle
+    From: India
+
+/* THANKS */
+    AI: Groq (Llama 3)
+    Design: Glassmorphism Enthusiasts
+
+/* SITE */
+    Last update: 2026/04/18
+    Language: English
+    Doctype: HTML5
+    IDE: VS Code, Antigravity AI

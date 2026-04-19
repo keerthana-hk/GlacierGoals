@@ -1,0 +1,2 @@
+gemini-2.5-flash-lite SUCCESS
+gemma-3-1b-it SUCCESS

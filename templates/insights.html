@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="header-section">
+    <div>
+        <h1 class="handwritten">Your Insights 📊</h1>
+        <p class="subtitle">See how your habits shape your life.</p>
+    </div>
+    <div>
+        <a href="{{ url_for('dashboard') }}" class="clay-button" style="background: var(--secondary); color: white;">← Back to Board</a>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 20px;">
+    <!-- Stat Card -->
+    <div class="clay-card" style="text-align: center; background: rgba(148, 178, 163, 0.1);">
+        <h3 class="handwritten" style="font-size: 2rem; color: var(--primary);">Total Lifelong Check-ins</h3>
+        <div style="font-size: 4rem; font-weight: 800; color: var(--primary);">{{ total_completed }}</div>
+        <p>Habits crushed so far!</p>
+    </div>
+    
+    <!-- Category Chart -->
+    <div class="clay-card" style="display: flex; flex-direction: column; align-items: center;">
+        <h3 class="handwritten" style="margin-top:0;">Habit Horizon</h3>
+        <canvas id="categoryChart" style="max-height: 250px;"></canvas>
+    </div>
+
+    <!-- Mood Chart -->
+    <div class="clay-card" style="display: flex; flex-direction: column; align-items: center;">
+        <h3 class="handwritten" style="margin-top:0;">Mood Dynamics</h3>
+        <canvas id="moodChart" style="max-height: 250px;"></canvas>
+        {% if moods|length == 0 %}
+        <p style="color: var(--text-light); text-align:center; margin-top:20px;">Check off a few habits and track your mood to see data here!</p>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Category Chart
+        const ctxCat = document.getElementById('categoryChart').getContext('2d');
+        new Chart(ctxCat, {
+            type: 'doughnut',
+            data: {
+                labels: {{ categories | safe }},
+                datasets: [{
+                    data: {{ cat_data | safe }},
+                    backgroundColor: ['#94b2a3', '#d6b8c0', '#a18cd1', '#fbc2eb', '#f1c40f'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+
+        // Mood Chart
+        const moodsStr = {{ moods | safe | tojson }};
+        const moodData = {{ mood_data | safe }};
+        if (moodsStr.length > 0) {
+            const ctxMood = document.getElementById('moodChart').getContext('2d');
+            new Chart(ctxMood, {
+                type: 'bar',
+                data: {
+                    labels: moodsStr,
+                    datasets: [{
+                        label: 'Check-ins',
+                        data: moodData,
+                        backgroundColor: '#d6b8c0',
+                        borderRadius: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

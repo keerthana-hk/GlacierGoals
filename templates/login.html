@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="clay-card auth-form">
+    <div class="iso-flair" style="top: -20px; left: -20px;"></div>
+    <h2>Welcome Back  👋</h2>
+    <p class="text-light handwritten">Log in to track your resolutions!</p>
+    
+    <form method="POST" action="{{ url_for('login') }}">
+        <input type="email" name="email" class="clay-input" placeholder="Email Address" required style="margin-bottom: 15px;">
+        <input type="password" name="password" class="clay-input" placeholder="Password" required style="margin-bottom: 15px;">
+        
+        <button type="submit" class="clay-button primary" style="width: 100%; margin-top: 10px;">Login</button>
+    </form>
+    
+    <p style="margin-top: 20px;">
+        Don't have an account? <a href="{{ url_for('register') }}" style="color: var(--primary); font-weight: bold;">Sign up</a>
+    </p>
+</div>
+{% endblock %}

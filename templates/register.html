@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="clay-card auth-form">
+    <div class="iso-flair" style="top: -20px; right: -20px; background: var(--secondary); transform: rotateX(60deg) rotateZ(-45deg);"></div>
+    <h2>Join GlacierGoals 🚀</h2>
+    <p class="text-light handwritten">Start building better habits today</p>
+    
+    <form method="POST" action="{{ url_for('register') }}">
+        <input type="text" name="name" class="clay-input" placeholder="Full Name (Optional)" style="margin-bottom: 15px;">
+        <input type="text" name="nickname" class="clay-input" placeholder="What should the AI call you?" style="margin-bottom: 15px;">
+        <input type="email" name="email" class="clay-input" placeholder="Email Address" required style="margin-bottom: 15px;">
+        <input type="password" name="password" class="clay-input" placeholder="Password" required style="margin-bottom: 15px;">
+        
+        <button type="submit" class="clay-button primary" style="width: 100%; margin-top: 10px;">Create Account</button>
+    </form>
+    
+    <p style="margin-top: 20px;">
+        Already have an account? <a href="{{ url_for('login') }}" style="color: var(--primary); font-weight: bold;">Login</a>
+    </p>
+</div>
+{% endblock %}

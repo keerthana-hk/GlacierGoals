@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /vault/
+Disallow: /api/
+Disallow: /logout
+Disallow: /instance/
+
+Sitemap: https://glaciergoals.com/sitemap.xml
