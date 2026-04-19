@@ -591,13 +591,24 @@
         };
 
         window.triggerBurn = function(btn, id) {
-            if(confirm('Incinerate this secret? The fire cannot be undone.')) {
-                const card = btn.closest('.vault-card');
-                card.classList.add('burning-card');
-                setTimeout(() => {
-                    document.getElementById('delete-form-' + id).submit();
-                }, 2900); // Submits right as the visual fire wipes it out completely
-            }
+            Swal.fire({
+                title: 'Incinerate Secret? 🔥',
+                text: "The fire cannot be undone. This memory will be permanently lost.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e74c3c',
+                cancelButtonColor: '#bdc3c7',
+                confirmButtonText: 'Yes, Burn it!',
+                customClass: { popup: 'glacier-swal-popup' }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const card = btn.closest('.vault-card');
+                    card.classList.add('burning-card');
+                    setTimeout(() => {
+                        document.getElementById('delete-form-' + id).submit();
+                    }, 2900);
+                }
+            });
         };
 
         // Editor

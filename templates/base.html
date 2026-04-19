@@ -17,6 +17,22 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=17">
     <!-- Premium Icons from Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- SweetAlert2 for beautiful popups -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .glacier-swal-popup {
+            background: rgba(255, 255, 255, 0.8) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border-radius: 32px !important;
+            border: 1px solid rgba(255, 255, 255, 0.5) !important;
+            font-family: 'Outfit', sans-serif !important;
+        }
+        body.theme-midnight .glacier-swal-popup {
+            background: rgba(20, 20, 30, 0.85) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+    </style>
 </head>
 <body>
 
@@ -92,7 +108,7 @@
         <span class="mobile-icon">🔒</span>
         <span>Vault</span>
     </a>
-    <a href="{{ url_for('logout') }}" class="mobile-tab" onclick="return confirm('Ready to log out?');" style="color:#e74c3c">
+    <a href="#" class="mobile-tab" onclick="appLogout(event)" style="color:#e74c3c">
         <span class="mobile-icon">🚪</span>
         <span>Logout</span>
     </a>
@@ -665,6 +681,23 @@ if ('serviceWorker' in navigator) {
             console.log('ServiceWorker error:', err);
         }
     });
+    window.appLogout = function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Leaving already? ❄️',
+            text: "Are you ready to log out of GlacierGoals?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#4facfe',
+            cancelButtonColor: '#fe4f6c',
+            confirmButtonText: 'Yes, Logout',
+            customClass: { popup: 'glacier-swal-popup' }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{{ url_for('logout') }}";
+            }
+        });
+    };
 }
 </script>
 <footer style="margin-top: 50px; padding: 20px; text-align: center; color: rgba(255,255,255,0.4); font-size: 0.85rem;">
