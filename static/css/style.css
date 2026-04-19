@@ -371,6 +371,9 @@ body.theme-midnight .hm-day { background: rgba(255,255,255,0.05); }
         transform: translateY(-4px);
     }
 
+    /* Lift Penguin Avatar ABOVE the bottom tab bar */
+    #glacier-avatar-container { bottom: 90px !important; left: 15px !important; }
+
     /* Keep Notification Bell safely inside top nav */
     .notif-bell-wrap { position: relative !important; margin-right: 0 !important; top: auto; right: auto; }
     .notif-panel { right: -5px !important; width: 300px; max-width: 90vw; top: 40px; }
