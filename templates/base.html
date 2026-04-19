@@ -14,7 +14,7 @@
     <link rel="icon" type="image/jpeg" href="{{ url_for('static', filename='images/penguin_v2.jpg') }}">
     <title>GlacierGoals</title>
     <!-- Simple icon mapping using emoji or fallback SVGs in css later if needed -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=15">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=16">
     <!-- Premium Icons from Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
@@ -73,6 +73,32 @@
         </div>
     </div>
 </nav>
+
+{% if current_user.is_authenticated %}
+<!-- NATIVE APP BOTTOM NAVBAR (Mobile Only) -->
+<nav class="mobile-bottom-nav">
+    <a href="{{ url_for('dashboard') }}" class="mobile-tab {% if request.endpoint == 'dashboard' %}active{% endif %}">
+        <span class="mobile-icon">📅</span>
+        <span>Home</span>
+    </a>
+    <a href="{{ url_for('calendar_view') }}" class="mobile-tab {% if request.endpoint == 'calendar_view' %}active{% endif %}">
+        <span class="mobile-icon">🗓️</span>
+        <span>Calendar</span>
+    </a>
+    <a href="{{ url_for('longterm') }}" class="mobile-tab {% if request.endpoint == 'longterm' %}active{% endif %}">
+        <span class="mobile-icon">🌍</span>
+        <span>Yearly</span>
+    </a>
+    <a href="{{ url_for('vault') }}" class="mobile-tab {% if request.endpoint == 'vault' %}active{% endif %}">
+        <span class="mobile-icon">🔒</span>
+        <span>Vault</span>
+    </a>
+    <a href="{{ url_for('logout') }}" class="mobile-tab" onclick="return confirm('Ready to log out?');" style="color:#e74c3c">
+        <span class="mobile-icon">🚪</span>
+        <span>Logout</span>
+    </a>
+</nav>
+{% endif %}
 
 <div class="container">
     {% with messages = get_flashed_messages(with_categories=true) %}

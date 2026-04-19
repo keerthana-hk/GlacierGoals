@@ -307,75 +307,82 @@ body.theme-midnight .hm-day { background: rgba(255,255,255,0.05); }
 
 /* Mobile Responsiveness for App Feel */
 @media (max-width: 768px) {
+    /* Top Navbar simplification */
     .glass-navbar {
-        position: relative; /* Crucial: stops it from blocking the screen when scrolling */
-        top: 0;
-        flex-direction: column;
-        gap: 10px;
-        padding: 15px 10px;
+        position: relative;
+        padding: 10px 15px;
         margin: 10px;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center;
     }
-    .glass-navbar > div {
-        flex-direction: column;
-        gap: 10px !important;
-        width: 100%;
-    }
-    .logo {
-        font-size: 1.6rem;
-    }
-    .theme-picker {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 6px !important;
-    }
-    .theme-picker button {
-        width: 25px !important;
-        height: 25px !important;
-    }
-    .nav-links {
+    .glass-navbar > div { width: auto; flex-direction: row; gap: 10px !important; }
+    .logo { font-size: 1.4rem; }
+    
+    /* Hide big buttons and themes in top bar to save pure space */
+    .nav-links, .theme-picker { display: none !important; }
+
+    /* The new bottom mobile app navigation bar */
+    .mobile-bottom-nav {
         display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
+        position: fixed;
+        bottom: 0;
+        left: 0;
         width: 100%;
-        gap: 6px;
-        justify-content: space-between;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        padding: 10px 0 15px 0;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+        z-index: 9999;
+        justify-content: space-around;
+        border-radius: 24px 24px 0 0;
+        border-top: 1px solid rgba(255,255,255,0.5);
     }
-    .nav-links .glass-nav-btn, .glass-navbar .clay-button {
-        margin: 0 !important;
-        text-align: center;
-        flex: 1 1 48%; /* Creates a neat 2x2 grid for buttons */
-        padding: 8px 5px;
-        font-size: 0.85rem;
-        box-sizing: border-box;
+    body.theme-midnight .mobile-bottom-nav {
+        background: rgba(30,30,30,0.85);
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+        border-top: 1px solid rgba(255,255,255,0.1);
     }
     
-    /* FIX: Put Notification bell nicely in the top right corner */
-    .notif-bell-wrap {
-        position: absolute;
-        top: 20px;
-        right: 20px;
+    .mobile-tab {
+        text-align: center;
+        text-decoration: none;
+        color: var(--text-light);
+        flex: 1;
+        padding: 5px;
+        transition: 0.2s;
     }
-    .notif-panel {
-        right: -10px !important; /* Stop panel from going off screen */
-        width: 320px;
-        max-width: 90vw;
+    .mobile-icon {
+        font-size: 1.4rem;
+        display: block;
+        transition: 0.2s;
     }
-    .notif-bell-btn {
-        background: rgba(255, 255, 255, 0.5) !important;
+    .mobile-tab span:not(.mobile-icon) {
+        display: block;
+        font-size: 0.65rem;
+        margin-top: 4px;
+        font-weight: 700;
+    }
+    .mobile-tab.active {
+        color: var(--primary);
+    }
+    .mobile-tab.active .mobile-icon {
+        transform: translateY(-4px);
     }
 
-    .header-section {
-        flex-direction: column;
-        text-align: center;
-    }
-    .resolution-list {
-        grid-template-columns: 1fr;
-    }
-    .clay-card, .cozy-card {
-        padding: 20px;
-    }
-    /* Fix login form sizing */
-    .container {
-        padding: 0 10px;
-    }
+    /* Keep Notification Bell safely inside top nav */
+    .notif-bell-wrap { position: relative !important; margin-right: 0 !important; top: auto; right: auto; }
+    .notif-panel { right: -5px !important; width: 300px; max-width: 90vw; top: 40px; }
+
+    /* Prevent content hiding behind bottom nav */
+    .container { padding-bottom: 90px !important; padding: 0 10px; margin-top: 10px; }
+    
+    .resolution-list { grid-template-columns: 1fr; }
+    .clay-card, .cozy-card { padding: 15px; }
+}
+
+/* Hide mobile bottom nav on Desktop */
+@media (min-width: 769px) {
+    .mobile-bottom-nav { display: none !important; }
 }
