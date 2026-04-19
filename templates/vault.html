@@ -27,8 +27,35 @@
 
     .diary-header-card h1 { font-family: 'Outfit', sans-serif; font-size: 2.5rem; margin: 0; font-weight: 700; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-    .fab { position: fixed; bottom: 40px; right: 50%; transform: translateX(50%); width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 15px 30px rgba(0,0,0,0.3); border: none; cursor: pointer; z-index: 100; transition: transform 0.2s; }
-    .fab:hover { transform: translateX(50%) scale(1.1); }
+    .fab { 
+        position: fixed; 
+        bottom: 90px; /* Elevated to stay above bottom nav */
+        right: 20px; 
+        width: 60px; 
+        height: 60px; 
+        border-radius: 50%; 
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); 
+        color: white; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 2rem; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
+        border: none; 
+        cursor: pointer; 
+        z-index: 1000; 
+        transition: transform 0.2s; 
+    }
+    .fab:hover { transform: scale(1.1); }
+    
+    @media (max-width: 768px) {
+        .fab { bottom: 95px; width: 54px; height: 54px; font-size: 1.8rem; right: 15px; }
+        .diary-header-card { padding: 15px !important; margin-bottom: 20px !important; border-radius: 20px !important; }
+        .diary-header-card h1 { font-size: 1.5rem !important; }
+        .diary-header-card p { font-size: 0.8rem !important; }
+        .settings-btn { padding: 8px 12px !important; font-size: 0.85rem !important; }
+        .vault-card { padding: 20px !important; border-radius: 18px !important; }
+    }
     
     .settings-btn { background: rgba(255,255,255,0.5); border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-family: 'Outfit'; font-weight: bold; display: flex; align-items: center; gap: 8px; color: var(--text-dark); transition: 0.2s; }
     .settings-btn:hover { background: rgba(255,255,255,0.8); transform: translateY(-2px); }
