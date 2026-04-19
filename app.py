@@ -289,7 +289,7 @@ def home():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        email = request.form.get('email')
+        email = request.form.get('email', '').strip().lower()
         name = request.form.get('name', '')
         nickname = request.form.get('nickname', '')
         password = request.form.get('password')
@@ -311,11 +311,14 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form.get('email')
+        email = request.form.get('email', '').strip().lower()
         password = request.form.get('password')
 
+        print(f"DEBUG: LOGIN ATTEMPT: {email}")
         user = User.query.filter_by(email=email).first()
+        
         if not user or not check_password_hash(user.password, password):
+            print(f"DEBUG: LOGIN FAIL: {'User not found' if not user else 'Password wrong'} for {email}")
             flash('Please check your login details and try again.')
             return redirect(url_for('login'))
 
@@ -333,12 +336,15 @@ def logout():
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
-        email = request.form.get('email')
+        email = request.form.get('email', '').strip().lower()
         user = User.query.filter_by(email=email).first()
         
         if user:
             import random
             code = str(random.randint(100000, 999999))
+            
+            # Print to logs so user can see it in Render logs if email fails
+            print(f"PASSWORD RESET CODE FOR {email}: {code}")
             
             # Clean up old resets for this email
             PasswordReset.query.filter_by(email=email).delete()
