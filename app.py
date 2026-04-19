@@ -30,10 +30,6 @@ if database_url.startswith("postgres://"):
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Ensure database tables are created (important for Render/Production)
-with app.app_context():
-    db.create_all()
-
 # Increase payload limit for Base64 Images (e.g., 50 MB)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024 
 app.config['MAX_FORM_MEMORY_SIZE'] = 50 * 1024 * 1024 
@@ -42,6 +38,10 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+# Ensure database tables are created (important for Render/Production)
+with app.app_context():
+    db.create_all()
 
 # Force HTTPS in production
 @app.before_request
