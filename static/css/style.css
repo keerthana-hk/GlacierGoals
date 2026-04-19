@@ -405,20 +405,57 @@ body.theme-midnight .hm-day { background: rgba(255,255,255,0.05); }
     }
     .logo { order: 1; margin: 0 !important; }
     .nav-links { display: none !important; }
-
-    .notif-panel { 
-        right: -100px !important; 
-        width: 300px; 
-        max-width: 90vw; 
-        top: 45px; 
-        z-index: 10001;
-    }
-
-    /* Prevent content hiding behind bottom nav */
-    .container { padding-bottom: 90px !important; padding: 0 10px; margin-top: 10px; }
+/* Responsive Mobile Compaction */
+@media (max-width: 768px) {
+    .hide-mobile { display: none !important; }
     
-    .resolution-list { grid-template-columns: 1fr; }
-    .clay-card, .cozy-card { padding: 15px; }
+    .glass-navbar {
+        margin: 5px;
+        padding: 5px 12px;
+        border-radius: 12px;
+    }
+    .logo {
+        font-size: 1.1rem !important;
+    }
+    .theme-picker {
+        gap: 3px !important;
+        padding: 2px 5px !important;
+    }
+    .theme-btn {
+        width: 18px !important;
+        height: 18px !important;
+        border-width: 2px !important;
+    }
+    .header-section {
+        margin-bottom: 10px !important;
+        gap: 5px !important;
+    }
+    .header-section h1 {
+        font-size: 1.8rem !important;
+    }
+    .clay-card {
+        padding: 12px !important;
+    }
+    .container {
+        padding: 0 8px !important;
+        padding-bottom: 80px !important;
+    }
+    
+    /* Stats Bar Compaction */
+    #daily-stats-bar {
+        padding: 8px 12px !important;
+        gap: 8px !important;
+        margin-bottom: 15px !important;
+    }
+    .xp-today-box {
+        padding: 4px 8px !important;
+        border-radius: 8px !important;
+    }
+    
+    .filter-btn {
+        padding: 4px 8px !important;
+        font-size: 0.75rem !important;
+    }
 }
 
 /* Hide mobile bottom nav on Desktop */

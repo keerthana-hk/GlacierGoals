@@ -2,34 +2,27 @@
 
 {% block content %}
 <div class="header-section">
-    <div>
-        <h1 class="handwritten">My Resolutions</h1>
-        <p class="subtitle">Stay consistent, stay focused.</p>
-        <div style="margin-top: 10px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <span style="font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 5px;"><span style="font-size: 1.2rem;">🧊</span> Ice Cubes: <span id="ice-cubes-count">{{
-                    user.freezes }}</span></span>
-            <span style="font-weight: bold; color: #16a085; background: rgba(26, 188, 156, 0.2); padding: 5px 12px; border-radius: 12px; display: flex; align-items: center; gap: 5px;" title="Glacier Pet Health"><i class="ph-fill ph-heart" style="color: #e74c3c; font-size: 1.2rem;"></i> Health: {{ user.pet_health }}/100</span>
+    <div style="flex: 1; min-width: 300px;">
+        <h1 class="handwritten" style="font-size: 2.2rem; margin: 0;">My Resolutions</h1>
+        <p class="subtitle hide-mobile" style="margin-bottom: 5px;">Stay consistent, stay focused.</p>
+        <div style="margin-top: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span class="stat-bubble" style="font-weight: bold; color: var(--primary); background: rgba(216, 67, 21, 0.1); padding: 4px 10px; border-radius: 12px; display: flex; align-items: center; gap: 4px;"><span style="font-size: 1.1rem;">🧊</span> <span class="hide-mobile">Cubes:</span> <span id="ice-cubes-count">{{ user.freezes }}</span></span>
+            <span class="stat-bubble" style="font-weight: bold; color: #16a085; background: rgba(26, 188, 156, 0.15); padding: 4px 10px; border-radius: 12px; display: flex; align-items: center; gap: 4px;" title="Glacier Pet Health"><i class="ph-fill ph-heart" style="color: #e74c3c; font-size: 1rem;"></i> <span class="hide-mobile">Health:</span> {{ user.pet_health }}</span>
 
             <!-- XP System display -->
-            <div class="xp-container" title="Current Level"
-                style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.05); padding: 4px 12px; border-radius: 12px;">
-                <span class="level-badge"
-                    style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 8px; font-weight: bold; font-size: 0.85rem;">Lvl
-                    {{ level }}</span>
-                <div class="xp-bar"
-                    style="width: 100px; height: 10px; background: rgba(0,0,0,0.1); border-radius: 5px; overflow: hidden; position: relative;">
-                    <div class="xp-fill"
-                        style="width: {{ xp_progress }}%; height: 100%; background: linear-gradient(90deg, #f1c40f, #f39c12); transition: width 0.5s ease;">
-                    </div>
+            <div class="xp-container stat-bubble" title="Current Level"
+                style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.05); padding: 4px 10px; border-radius: 12px;">
+                <span class="level-badge" style="background: var(--primary); color: white; padding: 1px 6px; border-radius: 6px; font-weight: bold; font-size: 0.75rem;">Lvl {{ level }}</span>
+                <div class="xp-bar hide-mobile" style="width: 60px; height: 8px; background: rgba(0,0,0,0.1); border-radius: 4px; overflow: hidden; position: relative;">
+                    <div class="xp-fill" style="width: {{ xp_progress }}%; height: 100%; background: linear-gradient(90deg, #f1c40f, #f39c12);"></div>
                 </div>
-                <span style="font-size: 0.75rem; color: var(--text-light); font-weight: bold;">{{ xp_progress }}/100
-                    XP</span>
+                <span style="font-size: 0.75rem; color: var(--text-light); font-weight: bold;">{{ xp_progress }} XP</span>
             </div>
 
-            <button id="ai-coach-btn" class="clay-button"
-                style="padding: 6px 16px; font-size: 0.85rem; background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); color: white; display: flex; align-items: center; gap: 6px;"><i class="ph-bold ph-scroll" style="font-size: 1.1rem;"></i> Daily Quest</button>
-            <button id="expedition-map-btn" class="clay-button" title="View Mountain Journey"
-                style="padding: 6px 16px; font-size: 0.85rem; background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); color: #2c3e50; border: none; display: flex; align-items: center; gap: 6px;"><i class="ph-bold ph-mountains" style="font-size: 1.1rem;"></i> Expedition Map</button>
+            <div style="display: flex; gap: 5px;">
+                <button id="ai-coach-btn" class="clay-button" style="padding: 4px 10px; font-size: 0.75rem; background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); color: white; border: none;"><i class="ph-bold ph-scroll"></i> Quest</button>
+                <button id="expedition-map-btn" class="clay-button" style="padding: 4px 10px; font-size: 0.75rem; background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); color: #2c3e50; border: none;"><i class="ph-bold ph-mountains"></i> Map</button>
+            </div>
         </div>
     </div>
     <div>
@@ -94,29 +87,25 @@
 <!-- ✨ Daily Progress Stats Bar -->
 {% set total_res = resolutions|length %}
 {% set done_count = resolutions|selectattr('done_today')|list|length %}
-<div id="daily-stats-bar" class="clay-card" style="margin-bottom: 20px; padding: 16px 24px; background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.4)); border: 1px solid rgba(255,255,255,0.6); display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-    <div style="flex: 1; min-width: 180px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span style="font-weight: 700; font-size: 0.95rem; color: var(--primary);">⚡ Today's Progress</span>
-            <span id="stats-fraction" style="font-weight: 800; font-size: 1.1rem; color: var(--primary);">{{ done_count }}/{{ total_res }}</span>
+<div id="daily-stats-bar" class="clay-card" style="margin-bottom: 20px; padding: 12px 20px; background: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.6); display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 150px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span style="font-weight: 700; font-size: 0.85rem; color: var(--primary);">⚡ <span class="hide-mobile">Today's</span> Progress</span>
+            <span id="stats-fraction" style="font-weight: 800; font-size: 1rem; color: var(--primary);">{{ done_count }}/{{ total_res }}</span>
         </div>
-        <div style="height: 10px; background: rgba(0,0,0,0.08); border-radius: 10px; overflow: hidden;">
+        <div style="height: 6px; background: rgba(0,0,0,0.08); border-radius: 10px; overflow: hidden;">
             <div id="stats-progress-bar" style="height: 100%; width: {{ ((done_count / total_res * 100) if total_res > 0 else 0)|int }}%; background: linear-gradient(90deg, #43e97b, #38f9d7); border-radius: 10px; transition: width 0.6s ease;"></div>
         </div>
     </div>
-    <div style="display: flex; gap: 14px; flex-wrap: wrap;">
-        <div style="text-align: center; background: rgba(243,156,18,0.1); padding: 8px 14px; border-radius: 12px; border: 1px solid rgba(243,156,18,0.2);">
-            <div style="font-size: 1.4rem; font-weight: 800; color: #f39c12;">{{ done_count * 10 }}</div>
-            <div style="font-size: 0.7rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px;">XP Today</div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <div class="xp-today-box" style="text-align: center; background: rgba(243,156,18,0.1); padding: 5px 10px; border-radius: 10px; border: 1px solid rgba(243,156,18,0.2);">
+            <div style="font-size: 1.1rem; font-weight: 800; color: #f39c12; line-height:1;">{{ done_count * 10 }}</div>
+            <div style="font-size: 0.6rem; font-weight: 600; color: var(--text-light); text-transform: uppercase;">XP TODAY</div>
         </div>
         {% set longest = namespace(val=0) %}{% for r in resolutions %}{% if r.streak > longest.val %}{% set longest.val = r.streak %}{% endif %}{% endfor %}
-        <div style="text-align: center; background: rgba(231,76,60,0.1); padding: 8px 14px; border-radius: 12px; border: 1px solid rgba(231,76,60,0.2);">
-            <div style="font-size: 1.4rem; font-weight: 800; color: #e74c3c;">🔥 {{ longest.val }}</div>
-            <div style="font-size: 0.7rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px;">Best Streak</div>
-        </div>
-        <div style="text-align: center; background: rgba(108,92,231,0.1); padding: 8px 14px; border-radius: 12px; border: 1px solid rgba(108,92,231,0.2);">
-            <div style="font-size: 1.4rem; font-weight: 800; color: #6c5ce7;">Lvl {{ level }}</div>
-            <div style="font-size: 0.7rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px;">{{ xp_progress }} / 100 XP</div>
+        <div class="xp-today-box" style="text-align: center; background: rgba(231,76,60,0.1); padding: 5px 10px; border-radius: 10px; border: 1px solid rgba(231,76,60,0.2);">
+            <div style="font-size: 1.1rem; font-weight: 800; color: #e74c3c; line-height:1;">🔥 {{ longest.val }}</div>
+            <div style="font-size: 0.6rem; font-weight: 600; color: var(--text-light); text-transform: uppercase;">STREAK</div>
         </div>
     </div>
 </div>
