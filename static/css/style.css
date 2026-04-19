@@ -348,6 +348,22 @@ body.theme-midnight .hm-day { background: rgba(255,255,255,0.05); }
         font-size: 0.85rem;
         box-sizing: border-box;
     }
+    
+    /* FIX: Put Notification bell nicely in the top right corner */
+    .notif-bell-wrap {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
+    .notif-panel {
+        right: -10px !important; /* Stop panel from going off screen */
+        width: 320px;
+        max-width: 90vw;
+    }
+    .notif-bell-btn {
+        background: rgba(255, 255, 255, 0.5) !important;
+    }
+
     .header-section {
         flex-direction: column;
         text-align: center;
