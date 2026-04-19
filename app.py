@@ -20,10 +20,11 @@ groq_client = Groq(api_key=ai_key) if ai_key else None
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'glacier-goals-2026-dynamic-v3-stable')
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
+app.config['SESSION_PERMANENT'] = True
 
 # VAPID Keys for Web Push Notifications
 VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY', 'BE_rEo8x630K3NCzt1I2OM_w2HJ-QW05pdNdjVbLn9qkXkbJrw8Ym2PeBQJgtzO2z42VZtLMMy_UqGdn2JWqH98')
@@ -349,7 +350,9 @@ def login():
             flash('Incorrect password. Please try again or reset it.')
             return redirect(url_for('login'))
 
+        session.permanent = True
         login_user(user, remember=True)
+        print(f"DEBUG: LOGIN SUCCESS for {email}. Session marked permanent.")
         return redirect(url_for('dashboard'))
 
     return render_template('login.html')
