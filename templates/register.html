@@ -6,17 +6,22 @@
     <h2>Join GlacierGoals 🚀</h2>
     <p class="text-light handwritten">Start building better habits today</p>
     
+    <div class="auth-tabs" style="display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+        <a href="{{ url_for('login') }}" style="flex: 1; text-align: center; color: var(--text-light); text-decoration: none; padding-bottom: 5px;">Login</a>
+        <a href="{{ url_for('register') }}" style="flex: 1; text-align: center; font-weight: bold; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 5px; text-decoration: none;">Sign Up</a>
+    </div>
+
     <form method="POST" action="{{ url_for('register') }}">
         <input type="text" name="name" class="clay-input" placeholder="Full Name (Optional)" style="margin-bottom: 15px;">
-        <input type="text" name="nickname" class="clay-input" placeholder="What should the AI call you?" style="margin-bottom: 15px;">
+        <input type="text" name="nickname" class="clay-input" placeholder="Nickname for AI" style="margin-bottom: 15px;">
         <input type="email" name="email" class="clay-input" placeholder="Email Address" required style="margin-bottom: 15px;">
         <input type="password" name="password" class="clay-input" placeholder="Password" required style="margin-bottom: 15px;">
         
         <button type="submit" class="clay-button primary" style="width: 100%; margin-top: 10px;">Create Account</button>
     </form>
     
-    <p style="margin-top: 20px;">
-        Already have an account? <a href="{{ url_for('login') }}" style="color: var(--primary); font-weight: bold;">Login</a>
+    <p style="margin-top: 20px; font-size: 0.9rem;">
+        Already have an account? <a href="{{ url_for('login') }}" style="color: var(--primary); font-weight: bold;">Login here</a>
     </p>
 </div>
 {% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="clay-card auth-form">
+    <div class="iso-flair" style="top: -20px; right: -20px; background: var(--accent);"></div>
+    <h2>Verify Email 📧</h2>
+    <p class="text-light handwritten">We sent a 6-digit code to <strong>{{ email }}</strong></p>
+    
+    <form method="POST">
+        <input type="hidden" name="email" value="{{ email }}">
+        <input type="text" name="code" class="clay-input" placeholder="Enter 6-digit code" required 
+               style="letter-spacing: 10px; font-size: 1.5rem; text-align: center; margin-bottom: 20px;" maxlength="6">
+        
+        <button type="submit" class="clay-button primary" style="width: 100%;">Verify & Continue</button>
+    </form>
+    
+    <p style="margin-top: 20px;">
+        Didn't get it? <a href="{{ url_for('forgot_password') }}" style="color: var(--primary); font-weight: bold;">Resend Code</a>
+    </p>
+</div>
+{% endblock %}

@@ -164,6 +164,14 @@ class PushSubscription(db.Model):
     auth = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+class PasswordReset(db.Model):
+    """Stores temporary 6-digit verification codes for password resets."""
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(150), nullable=False)
+    code = db.Column(db.String(6), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_verified = db.Column(db.Boolean, default=False)
+
 # Ensure database tables exist in production
 with app.app_context():
     import os
@@ -321,6 +329,81 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = User.query.filter_by(email=email).first()
+        
+        if user:
+            import random
+            code = str(random.randint(100000, 999999))
+            
+            # Clean up old resets for this email
+            PasswordReset.query.filter_by(email=email).delete()
+            
+            new_reset = PasswordReset(email=email, code=code)
+            db.session.add(new_reset)
+            db.session.commit()
+            
+            # Send Email
+            subject = "🧊 GlacierGoals: Your Password Reset Code"
+            body = f"Hello!\n\nYour 6-digit verification code to reset your password is: {code}\n\nThis code was requested just now. If you didn't request this, please ignore this email."
+            send_email_notification(email, subject, body)
+            
+            flash('Verification code sent to your email!')
+            return redirect(url_for('verify_reset', email=email))
+        else:
+            flash('If that email exists in our system, you will receive a code.')
+            # We don't say if it doesn't exist for security
+            return redirect(url_for('forgot_password'))
+            
+    return render_template('forgot_password.html')
+
+@app.route('/verify-reset', methods=['GET', 'POST'])
+def verify_reset():
+    email = request.args.get('email')
+    if request.method == 'POST':
+        email = request.form.get('email')
+        code = request.form.get('code')
+        
+        reset_req = PasswordReset.query.filter_by(email=email, code=code).first()
+        if reset_req:
+            # Code is old if > 15 mins
+            if datetime.utcnow() - reset_req.created_at > timedelta(minutes=15):
+                flash('Code expired. Please request a new one.')
+                return redirect(url_for('forgot_password'))
+                
+            reset_req.is_verified = True
+            db.session.commit()
+            return redirect(url_for('reset_password', email=email, code=code))
+        else:
+            flash('Invalid code. Please try again.')
+            
+    return render_template('verify_reset.html', email=email)
+
+@app.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    email = request.args.get('email')
+    code = request.args.get('code')
+    
+    reset_req = PasswordReset.query.filter_by(email=email, code=code, is_verified=True).first()
+    if not reset_req:
+        flash('Unauthorized. Please start the process again.')
+        return redirect(url_for('forgot_password'))
+        
+    if request.method == 'POST':
+        new_password = request.form.get('password')
+        user = User.query.filter_by(email=email).first()
+        if user:
+            user.password = generate_password_hash(new_password, method='pbkdf2:sha256')
+            db.session.delete(reset_req)
+            db.session.commit()
+            flash('Password reset successful! Please login.')
+            return redirect(url_for('login'))
+            
+    return render_template('reset_password.html', email=email, code=code)
 
 @app.route('/dashboard')
 @login_required

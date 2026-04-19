@@ -394,9 +394,25 @@ body.theme-midnight .hm-day { background: rgba(255,255,255,0.05); }
     /* Lift Penguin Avatar ABOVE the bottom tab bar */
     #glacier-avatar-container { bottom: 90px !important; left: 15px !important; }
 
-    /* Keep Notification Bell safely inside top nav */
-    .notif-bell-wrap { position: relative !important; margin-right: 0 !important; top: auto; right: auto; }
-    .notif-panel { right: -5px !important; width: 300px; max-width: 90vw; top: 40px; }
+    /* Keep Notification Bell safely inside top nav and ordered correctly */
+    .notif-bell-wrap { 
+        position: relative !important; 
+        margin-right: 0 !important; 
+        top: auto; 
+        right: auto; 
+        order: 2;
+        display: block !important;
+    }
+    .logo { order: 1; margin: 0 !important; }
+    .nav-links { display: none !important; }
+
+    .notif-panel { 
+        right: -100px !important; 
+        width: 300px; 
+        max-width: 90vw; 
+        top: 45px; 
+        z-index: 10001;
+    }
 
     /* Prevent content hiding behind bottom nav */
     .container { padding-bottom: 90px !important; padding: 0 10px; margin-top: 10px; }
