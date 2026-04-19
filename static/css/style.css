@@ -308,29 +308,45 @@ body.theme-midnight .hm-day { background: rgba(255,255,255,0.05); }
 /* Mobile Responsiveness for App Feel */
 @media (max-width: 768px) {
     .glass-navbar {
+        position: relative; /* Crucial: stops it from blocking the screen when scrolling */
+        top: 0;
         flex-direction: column;
-        gap: 15px;
-        padding: 15px;
+        gap: 10px;
+        padding: 15px 10px;
+        margin: 10px;
     }
     .glass-navbar > div {
         flex-direction: column;
-        gap: 15px !important;
+        gap: 10px !important;
         width: 100%;
+    }
+    .logo {
+        font-size: 1.6rem;
     }
     .theme-picker {
         flex-wrap: wrap;
         justify-content: center;
+        gap: 6px !important;
+    }
+    .theme-picker button {
+        width: 25px !important;
+        height: 25px !important;
     }
     .nav-links {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
+        flex-wrap: wrap;
         width: 100%;
-        gap: 8px;
+        gap: 6px;
+        justify-content: space-between;
     }
-    .nav-links .glass-nav-btn {
+    .nav-links .glass-nav-btn, .glass-navbar .clay-button {
         margin: 0 !important;
         text-align: center;
-        width: 100%;
+        flex: 1 1 48%; /* Creates a neat 2x2 grid for buttons */
+        padding: 8px 5px;
+        font-size: 0.85rem;
+        box-sizing: border-box;
     }
     .header-section {
         flex-direction: column;
@@ -341,5 +357,9 @@ body.theme-midnight .hm-day { background: rgba(255,255,255,0.05); }
     }
     .clay-card, .cozy-card {
         padding: 20px;
+    }
+    /* Fix login form sizing */
+    .container {
+        padding: 0 10px;
     }
 }
