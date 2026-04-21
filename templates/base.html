@@ -28,7 +28,7 @@
     <meta property="twitter:image" content="https://glaciergoals.onrender.com/static/images/penguin_v2.jpg">
     <title>GlacierGoals</title>
     <!-- Simple icon mapping using emoji or fallback SVGs in css later if needed -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=17">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=18">
     <!-- Premium Icons from Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <!-- SweetAlert2 for beautiful popups -->
@@ -144,14 +144,35 @@
 </div>
 
 <div class="mobile-bottom-nav">
-    <a href="{{ url_for('home') }}" class="nav-item">🏠<span>Home</span></a>
-    <a href="{{ url_for('dashboard') }}" class="nav-item">✅<span>Daily</span></a>
-    <a href="{{ url_for('calendar_view') }}" class="nav-item">📅<span>Calendar</span></a>
-    <a href="{{ url_for('longterm') }}" class="nav-item">🌍<span>Plans</span></a>
-    <a href="{{ url_for('vault') }}" class="nav-item">🔒<span>Diary</span></a>
+    <a href="{{ url_for('dashboard') }}" class="mobile-tab" id="tab-dashboard">
+        <i class="ph-bold ph-house mobile-icon"></i>
+        <span>Home</span>
+    </a>
+    <a href="{{ url_for('calendar_view') }}" class="mobile-tab" id="tab-calendar">
+        <i class="ph-bold ph-calendar-blank mobile-icon"></i>
+        <span>Calendar</span>
+    </a>
+    <a href="{{ url_for('longterm') }}" class="mobile-tab" id="tab-longterm">
+        <i class="ph-bold ph-sketch-logo mobile-icon"></i>
+        <span>Plans</span>
+    </a>
+    <a href="{{ url_for('vault') }}" class="mobile-tab" id="tab-vault">
+        <i class="ph-bold ph-lock-key mobile-icon"></i>
+        <span>Diary</span>
+    </a>
 </div>
 
-{% if current_user.nickname %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const path = window.location.pathname;
+        if (path.includes('dashboard')) document.getElementById('tab-dashboard')?.classList.add('active');
+        else if (path.includes('calendar')) document.getElementById('tab-calendar')?.classList.add('active');
+        else if (path.includes('longterm')) document.getElementById('tab-longterm')?.classList.add('active');
+        else if (path.includes('vault')) document.getElementById('tab-vault')?.classList.add('active');
+    });
+</script>
+
+{% if current_user.is_authenticated %}
 <div id="penguin-companion-wrap">
     <div id="penguin-container">
         <!-- Penguin Body -->
@@ -175,7 +196,7 @@
     
     <div id="tom-speech-bubble">
         <p id="tom-status">Tap to Converse</p>
-        <button id="tom-mic-btn" title="Speak to Tommy">🎙️</button>
+        <button id="tom-mic-btn" title="Speak to Buddy"><i class="ph-bold ph-microphone"></i></button>
     </div>
 </div>
 
@@ -211,10 +232,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function sendToAI(text) {
         try {
-            const res = await fetch('/api/chat', {
+            const res = await fetch('/api/avatar/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text })
+                body: JSON.stringify({ message: text, history: [] }) // Add history if needed, but start with empty
             });
             const data = await res.json();
             if (data.reply) {
