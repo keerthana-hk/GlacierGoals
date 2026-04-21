@@ -145,19 +145,19 @@
 
 <div class="mobile-bottom-nav">
     <a href="{{ url_for('dashboard') }}" class="mobile-tab" id="tab-dashboard">
-        <i class="ph-bold ph-house mobile-icon"></i>
-        <span>Home</span>
+        <span class="mobile-icon">✅</span>
+        <span>Daily</span>
     </a>
     <a href="{{ url_for('calendar_view') }}" class="mobile-tab" id="tab-calendar">
-        <i class="ph-bold ph-calendar-blank mobile-icon"></i>
+        <span class="mobile-icon">📅</span>
         <span>Calendar</span>
     </a>
     <a href="{{ url_for('longterm') }}" class="mobile-tab" id="tab-longterm">
-        <i class="ph-bold ph-sketch-logo mobile-icon"></i>
+        <span class="mobile-icon">🌍</span>
         <span>Plans</span>
     </a>
     <a href="{{ url_for('vault') }}" class="mobile-tab" id="tab-vault">
-        <i class="ph-bold ph-lock-key mobile-icon"></i>
+        <span class="mobile-icon">🔒</span>
         <span>Diary</span>
     </a>
 </div>
@@ -174,7 +174,7 @@
 
 {% if current_user.is_authenticated %}
 <div id="penguin-companion-wrap">
-    <div id="penguin-container">
+    <div id="penguin-container" onclick="document.getElementById('tom-mic-btn').click()" title="Tap to talk!">
         <!-- Penguin Body -->
         <div class="p-body">
             <div class="p-tummy"></div>
@@ -196,7 +196,7 @@
     
     <div id="tom-speech-bubble">
         <p id="tom-status">Tap to Converse</p>
-        <button id="tom-mic-btn" title="Speak to Buddy"><i class="ph-bold ph-microphone"></i></button>
+        <button id="tom-mic-btn" title="Speak to Buddy">🎙️</button>
     </div>
 </div>
 
@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     function updateMouth(openPercent, duration) {
-        mouth.style.height = (openPercent * 0.1) + 'px';
+        mouth.style.height = (openPercent * 1.5) + 'px';
         mouth.style.borderRadius = openPercent > 0 ? '50%' : '2px';
     }
 
