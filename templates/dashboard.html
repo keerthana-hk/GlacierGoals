@@ -122,12 +122,7 @@
     {% endif %}
 
     {% for res in resolutions %}
-    <!-- ... same as before ... -->
-    {% endfor %}
-</div>
 
-<!-- Floating Action Button for Dashboard -->
-<button class="fab" id="dashboard-fab" style="bottom: 90px; right: 20px; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); box-shadow: 0 10px 25px rgba(67, 233, 123, 0.4);" onclick="document.getElementById('add-res-btn').click()"><i class="ph-bold ph-plus"></i></button>
     <div class="res-item cozy-card{% if res.done_today %} all-done-card{% endif %}" data-category="{{ res.category }}" draggable="true" data-id="{{ res.id }}"
         id="res-{{ res.id }}" style="cursor: grab; --random-rotate: {{ loop.index0 % 10 / 10.0 }};">
         <div class="res-header">
@@ -228,6 +223,9 @@
     </div>
     {% endfor %}
 </div>
+
+<!-- Floating Action Button for Dashboard -->
+<button class="fab" id="dashboard-fab" style="bottom: 90px; right: 20px; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); box-shadow: 0 10px 25px rgba(67, 233, 123, 0.4);" onclick="document.getElementById('add-res-btn').click()"><i class="ph-bold ph-plus"></i></button>
 
 {% if archived_resolutions|length > 0 %}
 <div class="header-section" style="margin-top: 60px;">
