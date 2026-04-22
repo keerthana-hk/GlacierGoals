@@ -180,7 +180,7 @@
     </div>
     
     <div id="tom-speech-bubble">
-        <p id="tom-status">Tap to Converse</p>
+        <p id="tom-status" style="text-transform: uppercase; letter-spacing: 1px;">TAP TO CONVERSE</p>
         <button id="tom-mic-btn" title="Speak to Buddy">🎙️</button>
     </div>
 </div>
@@ -205,14 +205,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function animateMouth(text) {
         let i = 0;
         const intr = setInterval(() => {
-            if (i >= text.length) {
+            if (i >= text.length * 2) { // Double duration for speech fill
                 clearInterval(intr);
                 updateMouth(0, 0);
                 return;
             }
-            updateMouth(Math.random() * 8 + 2, 100);
+            // Rapid random movement for "speaking" effect
+            const openSize = Math.random() > 0.3 ? (Math.random() * 6 + 3) : 0;
+            updateMouth(openSize, 80);
             i++;
-        }, 100);
+        }, 80);
     }
 
     async function sendToAI(text) {
