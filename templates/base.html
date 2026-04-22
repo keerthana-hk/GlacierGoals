@@ -11,21 +11,21 @@
     <meta name="description" content="GlacierGoals: Your ultimate resolution and habit tracker with a caring AI Penguin buddy, secret diary vault, yearly plans, and a heartfelt letter to your future self.">
     <meta name="keywords" content="resolution tracker, habit tracker, AI companion, AI avatar penguin, AI interaction, private diary, secret diary, letter to future self, yearly plans, personal development, productivity">
     <meta name="robots" content="index, follow">
-    <link rel="icon" type="image/jpeg" href="{{ url_for('static', filename='images/penguin_v2.jpg') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/blue_penguin_single.png') }}">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://glaciergoals.onrender.com/">
     <meta property="og:title" content="GlacierGoals - Freeze Your 2026 Goals in Time">
     <meta property="og:description" content="The ultimate habit tracker with an AI Penguin buddy, secret diary vault, and future letters.">
-    <meta property="og:image" content="https://glaciergoals.onrender.com/static/images/penguin_v2.jpg">
+    <meta property="og:image" content="https://glaciergoals.onrender.com/static/images/blue_penguin_single.png">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://glaciergoals.onrender.com/">
     <meta property="twitter:title" content="GlacierGoals - Freeze Your 2026 Goals in Time">
     <meta property="twitter:description" content="The ultimate habit tracker with an AI Penguin buddy, secret diary vault, and future letters.">
-    <meta property="twitter:image" content="https://glaciergoals.onrender.com/static/images/penguin_v2.jpg">
+    <meta property="twitter:image" content="https://glaciergoals.onrender.com/static/images/blue_penguin_single.png">
     <title>GlacierGoals</title>
     <!-- Simple icon mapping using emoji or fallback SVGs in css later if needed -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=19">
@@ -175,23 +175,8 @@
 {% if current_user.is_authenticated %}
 <div id="penguin-companion-wrap">
     <div id="penguin-container" onclick="document.getElementById('tom-mic-btn').click()" title="Tap to talk!">
-        <!-- Penguin Body -->
-        <div class="p-body">
-            <div class="p-tummy"></div>
-            <!-- Eyes -->
-            <div class="p-eye left"><div class="p-pupil"></div></div>
-            <div class="p-eye right"><div class="p-pupil"></div></div>
-            <!-- Beak -->
-            <div class="p-beak"></div>
-            <!-- Mouth for speech -->
-            <div class="p-mouth" id="p-mouth"></div>
-            <!-- Wings -->
-            <div class="p-wing left"></div>
-            <div class="p-wing right"></div>
-            <!-- Feet -->
-            <div class="p-foot left"></div>
-            <div class="p-foot right"></div>
-        </div>
+        <img src="{{ url_for('static', filename='images/blue_penguin_single.png') }}" class="p-character-img" id="penguin-char" style="width: 100%; height: 100%; object-fit: contain;">
+        <div class="p-mouth" id="p-mouth"></div>
     </div>
     
     <div id="tom-speech-bubble">
