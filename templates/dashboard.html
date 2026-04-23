@@ -38,7 +38,7 @@
             <button class="clay-button filter-btn" data-filter="Other"
                 style="padding: 5px 10px; font-size: 0.8rem;">Other</button>
         </div>
-        <button id="add-res-btn" class="clay-button primary" style="display: flex; align-items: center; gap: 6px;"><i class="ph-bold ph-plus" style="font-size: 1.1rem;"></i> Add Resolution</button>
+        <button id="add-res-btn" class="clay-button primary" style="display: flex; align-items: center; gap: 6px;"><i class="ph-bold ph-plus"></i> Add Resolution</button>
     </div>
 </div>
 
@@ -117,7 +117,7 @@
     <div class="clay-card" style="text-align: center; padding: 50px; grid-column: 1 / -1; background: rgba(255,255,255,0.2); border: 2px dashed rgba(255,255,255,0.4);">
         <i class="ph-fill ph-sparkle" style="font-size: 4rem; color: var(--primary); margin-bottom: 20px; opacity: 0.5; display: block;"></i>
         <p class="handwritten" style="font-size: 2rem; color: var(--text-dark); margin-bottom: 20px;">No resolutions yet!</p>
-        <button onclick="document.getElementById('add-res-btn').click()" class="clay-button primary"><i class="ph-bold ph-plus"></i> Start Your First Goal</button>
+        <button onclick="document.getElementById('add-res-btn').click()" class="clay-button primary"><i class="ph-bold ph-star"></i> Start Your First Goal</button>
     </div>
     {% endif %}
 
@@ -224,9 +224,6 @@
     {% endfor %}
 </div>
 
-<!-- Floating Action Button for Dashboard -->
-<button class="fab" id="dashboard-fab" style="bottom: 90px; right: 20px; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); box-shadow: 0 10px 25px rgba(67, 233, 123, 0.4);" onclick="document.getElementById('add-res-btn').click()"><i class="ph-bold ph-plus"></i></button>
-
 {% if archived_resolutions|length > 0 %}
 <div class="header-section" style="margin-top: 60px;">
     <div>
@@ -301,7 +298,7 @@
         <h2 class="handwritten">Time Capsules ⏳</h2>
         <p class="subtitle">Letters to your future self. Unlocks at specific levels.</p>
     </div>
-    <button id="add-capsule-btn" class="clay-button primary">➕ Create Capsule</button>
+    <button id="add-capsule-btn" class="clay-button primary"><i class="ph-bold ph-plus"></i> Create Capsule</button>
 </div>
 <div class="resolution-list" style="margin-bottom: 60px;">
     {% for cap in capsules %}

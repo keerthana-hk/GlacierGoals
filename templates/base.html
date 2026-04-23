@@ -118,10 +118,8 @@
                 <a href="{{ url_for('vault') }}" class="glass-nav-btn" style="margin-right: 10px; background: rgba(155, 89, 182, 0.2);">🔒 Diary Vault</a>
                 <a href="{{ url_for('logout') }}" class="glass-nav-btn logout-trigger" style="background: rgba(0,0,0,0.05);" onclick="appLogout(event)">Logout</a>
             {% else %}
-                {% if request.endpoint not in ['login', 'register', 'forgot_password', 'verify_reset', 'reset_password'] %}
                 <a href="{{ url_for('login') }}" class="glass-nav-btn" style="background: rgba(0,0,0,0.05);">Login</a>
                 <a href="{{ url_for('register') }}" class="glass-nav-btn primary" style="background: var(--primary); color: white;">Sign Up</a>
-                {% endif %}
             {% endif %}
         </div>
     </div>
@@ -144,22 +142,41 @@
 </div>
 
 <div class="mobile-bottom-nav">
-    <a href="{{ url_for('dashboard') }}" class="mobile-tab" id="tab-dashboard">
-        <span class="mobile-icon">✅</span>
-        <span>Daily</span>
-    </a>
-    <a href="{{ url_for('calendar_view') }}" class="mobile-tab" id="tab-calendar">
-        <span class="mobile-icon">📅</span>
-        <span>Calendar</span>
-    </a>
-    <a href="{{ url_for('longterm') }}" class="mobile-tab" id="tab-longterm">
-        <span class="mobile-icon">🌍</span>
-        <span>Plans</span>
-    </a>
-    <a href="{{ url_for('vault') }}" class="mobile-tab" id="tab-vault">
-        <span class="mobile-icon">🔒</span>
-        <span>Diary</span>
-    </a>
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('dashboard') }}" class="mobile-tab" id="tab-dashboard">
+            <i class="ph-bold ph-check-square mobile-icon"></i>
+            <span>Daily</span>
+        </a>
+        <a href="{{ url_for('calendar_view') }}" class="mobile-tab" id="tab-calendar">
+            <i class="ph-bold ph-calendar-blank mobile-icon"></i>
+            <span>Calendar</span>
+        </a>
+        <a href="{{ url_for('longterm') }}" class="mobile-tab" id="tab-longterm">
+            <i class="ph-bold ph-globe-hemisphere-west mobile-icon"></i>
+            <span>Plans</span>
+        </a>
+        <a href="{{ url_for('vault') }}" class="mobile-tab" id="tab-vault">
+            <i class="ph-bold ph-lock mobile-icon"></i>
+            <span>Diary</span>
+        </a>
+        <a href="{{ url_for('logout') }}" class="mobile-tab" onclick="appLogout(event)" style="color: #ff4757;">
+            <i class="ph-bold ph-sign-out mobile-icon"></i>
+            <span>Logout</span>
+        </a>
+    {% else %}
+        <a href="{{ url_for('home') }}" class="mobile-tab" id="tab-home">
+            <i class="ph-bold ph-house mobile-icon"></i>
+            <span>Home</span>
+        </a>
+        <a href="{{ url_for('login') }}" class="mobile-tab" id="tab-login">
+            <i class="ph-bold ph-user mobile-icon"></i>
+            <span>Login</span>
+        </a>
+        <a href="{{ url_for('register') }}" class="mobile-tab" id="tab-register">
+            <i class="ph-bold ph-user-plus mobile-icon"></i>
+            <span>Sign Up</span>
+        </a>
+    {% endif %}
 </div>
 
 <script>
@@ -173,15 +190,43 @@
 </script>
 
 {% if current_user.is_authenticated %}
-<div id="penguin-companion-wrap">
-    <div id="penguin-container" onclick="document.getElementById('tom-mic-btn').click()" title="Tap to talk!">
-        <img src="{{ url_for('static', filename='images/blue_penguin_single.png') }}" class="p-character-img" id="penguin-char" style="width: 100%; height: 100%; object-fit: contain;">
-        <div class="p-mouth" id="p-mouth"></div>
+<div id="penguin-companion-wrap" style="position: fixed; bottom: 80px; left: 20px; z-index: 9000; display: flex; align-items: flex-end; gap: 15px;">
+    <div id="penguin-container" onclick="openBigPenguin()" title="Meet your buddy!" style="position: relative; width: 80px; height: 90px; cursor: pointer; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+        <img src="{{ url_for('static', filename='images/blue_penguin_single.png') }}" id="penguin-char" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));">
+        <div id="p-mouth" style="position: absolute; top: 43%; left: 50%; width: 12px; height: 2px; background: #333; transform: translateX(-50%); border-radius: 50%; opacity: 0; transition: height 0.1s, opacity 0.1s;"></div>
+        <div style="position: absolute; top: -5px; left: -5px; background: white; padding: 4px; border-radius: 50%; font-size: 0.7rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); animation: float 2s infinite ease-in-out;">❤️</div>
     </div>
     
-    <div id="tom-speech-bubble">
-        <p id="tom-status" style="text-transform: uppercase; letter-spacing: 1px;">TAP TO CONVERSE</p>
-        <button id="tom-mic-btn" title="Speak to Buddy">🎙️</button>
+    <div id="tom-speech-bubble" style="background: white; padding: 12px 18px; border-radius: 20px 20px 20px 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 250px; border: 1px solid rgba(0,0,0,0.05); transform-origin: bottom left;">
+        <p id="tom-status" style="margin: 0; font-size: 0.9rem; font-weight: 700; color: #2c3e50; line-height: 1.4;">HELLO FRIEND! 👋</p>
+        <div style="display: flex; gap: 8px; margin-top: 10px;">
+            <button id="tom-mic-btn" title="Speak to Buddy" style="background: var(--primary); color: white; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; box-shadow: 0 4px 10px rgba(79,172,254,0.3);"><i class="ph-bold ph-microphone"></i></button>
+            <button onclick="openBigPenguin()" style="background: white; color: var(--primary); border: 1px solid var(--primary); padding: 0 12px; border-radius: 18px; cursor: pointer; font-size: 0.8rem; font-weight: bold; height: 36px;">Chat</button>
+        </div>
+    </div>
+</div>
+
+<!-- Big Penguin Modal -->
+<div class="modal-overlay" id="big-penguin-modal" style="z-index: 10000; align-items: center; justify-content: center;">
+    <div class="clay-card" style="max-width: 500px; width: 95vw; border-radius: 40px; padding: 40px; display: flex; flex-direction: column; align-items: center; background: linear-gradient(135deg, #ffffff, #f0f7ff);">
+        <button onclick="closeBigPenguin()" style="position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.05); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;"><i class="ph-bold ph-x"></i></button>
+        
+        <div style="position: relative; width: 180px; height: 200px; margin-bottom: 30px;">
+            <img src="{{ url_for('static', filename='images/blue_penguin_single.png') }}" style="width: 100%; height: 100%; object-fit: contain; animation: float 3s infinite ease-in-out;">
+            <div id="big-p-mouth" style="position: absolute; top: 43%; left: 50%; width: 25px; height: 4px; background: #333; transform: translateX(-50%); border-radius: 50%; opacity: 0; transition: height 0.1s, opacity 0.1s;"></div>
+        </div>
+        
+        <h2 class="handwritten" style="font-size: 2.2rem; margin: 0 0 10px; color: var(--primary);">I'm Glacier! 🐧</h2>
+        <p style="text-align: center; color: var(--text-light); margin-bottom: 25px; font-weight: 500;">I am your personal 2026 coach and best friend!</p>
+        
+        <div id="big-chat-history" style="width: 100%; max-height: 200px; overflow-y: auto; background: rgba(0,0,0,0.03); padding: 15px; border-radius: 20px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="background: white; padding: 10px 15px; border-radius: 15px 15px 15px 5px; max-width: 85%; align-self: flex-start; font-size: 0.9rem; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">Hi! How can I help you reach your goals today?</div>
+        </div>
+        
+        <div style="width: 100%; display: flex; gap: 10px;">
+            <input type="text" id="big-chat-input" class="clay-input" placeholder="Type something sweet..." style="flex: 1; border-radius: 20px; margin: 0;">
+            <button onclick="sendBigChat()" class="clay-button primary" style="padding: 0 25px; border-radius: 20px;"><i class="ph-bold ph-paper-plane-right"></i></button>
+        </div>
     </div>
 </div>
 
@@ -190,6 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tomMicBtn = document.getElementById('tom-mic-btn');
     const tomStatus = document.getElementById('tom-status');
     const mouth = document.getElementById('p-mouth');
+    const bigMouth = document.getElementById('big-p-mouth');
     
     let isListening = false;
     let recognition = null;
@@ -197,43 +243,94 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    function updateMouth(openPercent, duration) {
-        mouth.style.height = (openPercent * 1.5) + 'px';
-        mouth.style.borderRadius = openPercent > 0 ? '50%' : '2px';
+    function updateMouth(openPercent) {
+        if(mouth) {
+            mouth.style.height = openPercent + 'px';
+            mouth.style.opacity = openPercent > 0 ? 1 : 0;
+        }
+        if(bigMouth) {
+            bigMouth.style.height = (openPercent * 2) + 'px';
+            bigMouth.style.opacity = openPercent > 0 ? 1 : 0;
+        }
     }
 
     function animateMouth(text) {
         let i = 0;
         const intr = setInterval(() => {
-            if (i >= text.length * 2) { // Double duration for speech fill
+            if (i >= text.length * 1.5) {
                 clearInterval(intr);
-                updateMouth(0, 0);
+                updateMouth(0);
                 return;
             }
-            // Rapid random movement for "speaking" effect
-            const openSize = Math.random() > 0.3 ? (Math.random() * 6 + 3) : 0;
-            updateMouth(openSize, 80);
+            const openSize = Math.random() > 0.3 ? (Math.random() * 5 + 2) : 0;
+            updateMouth(openSize);
             i++;
-        }, 80);
+        }, 100);
     }
+
+    window.openBigPenguin = function() {
+        document.getElementById('big-penguin-modal').classList.add('active');
+        document.getElementById('big-chat-input').focus();
+    };
+    window.closeBigPenguin = function() {
+        document.getElementById('big-penguin-modal').classList.remove('active');
+    };
+
+    window.sendBigChat = async function() {
+        const input = document.getElementById('big-chat-input');
+        const text = input.value.trim();
+        if(!text) return;
+        
+        const history = document.getElementById('big-chat-history');
+        const userMsg = document.createElement('div');
+        userMsg.style = "background: var(--primary); color: white; padding: 10px 15px; border-radius: 15px 15px 5px 15px; max-width: 85%; align-self: flex-end; font-size: 0.9rem; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.1);";
+        userMsg.innerText = text;
+        history.appendChild(userMsg);
+        input.value = "";
+        history.scrollTop = history.scrollHeight;
+
+        const reply = await sendToAI(text);
+    };
+
+    document.getElementById('big-chat-input')?.addEventListener('keydown', e => {
+        if(e.key === 'Enter') sendBigChat();
+    });
 
     async function sendToAI(text) {
         try {
+            tomStatus.innerText = "Thinking...";
             const res = await fetch('/api/avatar/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text, history: [] }) // Add history if needed, but start with empty
+                body: JSON.stringify({ message: text, history: [] })
             });
             const data = await res.json();
             if (data.reply) {
                 tomStatus.innerText = data.reply;
+                const history = document.getElementById('big-chat-history');
+                if(history) {
+                    const aiMsg = document.createElement('div');
+                    aiMsg.style = "background: white; padding: 10px 15px; border-radius: 15px 15px 15px 5px; max-width: 85%; align-self: flex-start; font-size: 0.9rem; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.05);";
+                    aiMsg.innerText = data.reply;
+                    history.appendChild(aiMsg);
+                    history.scrollTop = history.scrollHeight;
+                }
+                
                 animateMouth(data.reply);
+                
                 if ('speechSynthesis' in window) {
+                    const voices = window.speechSynthesis.getVoices();
                     const utterance = new SpeechSynthesisUtterance(data.reply);
-                    utterance.pitch = 1.2;
-                    utterance.rate = 1.0;
+                    // Try to find a friendly voice
+                    const preferredVoice = voices.find(v => v.name.includes('Google') && v.lang.includes('en-GB')) || 
+                                           voices.find(v => v.name.includes('Female')) || 
+                                           voices[0];
+                    if(preferredVoice) utterance.voice = preferredVoice;
+                    utterance.pitch = 1.3;
+                    utterance.rate = 1.1;
                     window.speechSynthesis.speak(utterance);
                 }
+                return data.reply;
             }
         } catch (e) {
             tomStatus.innerText = "Tommy got a brain freeze! 🧊";
@@ -241,6 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function createRecognition() {
+        if(!SpeechRecognition) return null;
         const rec = new SpeechRecognition();
         rec.lang = 'en-US';
         rec.interimResults = true;
@@ -249,60 +347,39 @@ document.addEventListener('DOMContentLoaded', () => {
         rec.onstart = () => {
             isListening = true;
             tomMicBtn.classList.add('tom-listening');
-            tomStatus.innerText = "Listening... I'm all ears!";
+            tomStatus.innerText = "Listening...";
         };
 
         rec.onresult = (e) => {
             const liveText = Array.from(e.results).map(r => r[0].transcript).join('');
-            if (liveText) {
-                tomStatus.innerText = '🎤 "' + liveText.slice(-40) + '"';
-            }
-
+            if (liveText) tomStatus.innerText = '🎤 ' + liveText;
             clearTimeout(silenceTimer);
-            silenceTimer = setTimeout(() => {
-                if (isListening && liveText.length > 2) {
-                    rec.stop();
-                }
-            }, 2500); 
+            silenceTimer = setTimeout(() => { if (isListening && liveText.length > 1) rec.stop(); }, 2000); 
         };
 
         rec.onend = () => {
-            clearTimeout(silenceTimer);
             isListening = false;
             tomMicBtn.classList.remove('tom-listening');
-
-            const finalStory = tomStatus.innerText.replace('🎤 "', '').replace('"', '').trim();
-            if (finalStory && finalStory !== "Listening... I'm all ears!" && finalStory !== "Listening... speak now") {
-                tomStatus.innerText = "Got it! Thinking...";
-                sendToAI(finalStory);
-            } else {
-                tomStatus.innerText = "Tap to Converse";
-            }
+            const final = tomStatus.innerText.replace('🎤 ', '').trim();
+            if(final && final !== "Listening...") sendToAI(final);
+            else tomStatus.innerText = "Tap to Converse";
         };
 
         rec.onerror = (e) => {
-            clearTimeout(silenceTimer);
             isListening = false;
             tomMicBtn.classList.remove('tom-listening');
-            console.error("Speech Recognition Error:", e.error);
             tomStatus.innerText = "Tap to try again";
         };
 
         return rec;
     }
 
-    if (!SpeechRecognition) {
-        tomStatus.innerText = "Voice not supported. Use Chrome/Edge.";
-        tomMicBtn.style.opacity = '0.5';
-        tomMicBtn.disabled = true;
-    }
-
-    tomMicBtn.addEventListener('click', () => {
-        if (!SpeechRecognition) return;
-        if (isListening) {
-            if (recognition) recognition.stop();
+    tomMicBtn?.addEventListener('click', () => {
+        if (!SpeechRecognition) {
+            window.openBigPenguin();
             return;
         }
+        if (isListening) { recognition.stop(); return; }
         recognition = createRecognition();
         if (recognition) recognition.start();
     });
