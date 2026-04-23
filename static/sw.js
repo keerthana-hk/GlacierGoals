@@ -1,4 +1,4 @@
-const CACHE_NAME = 'glacier-cache-v8';
+const CACHE_NAME = 'glacier-cache-v10';
 const urlsToCache = [
   '/',
   '/static/css/style.css?v=20',

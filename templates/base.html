@@ -106,6 +106,14 @@
                 <div class="notif-list" id="notifList">
                     <div class="notif-empty">No notifications yet</div>
                 </div>
+                {% if current_user.is_authenticated %}
+                <div id="push-prompt" style="padding: 10px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); display: none;">
+                    <button onclick="window.requestNotificationPermission()" class="clay-button primary" style="padding: 5px 15px; font-size: 0.8rem;">Enable Push Alerts</button>
+                </div>
+                <script>
+                    if(Notification.permission !== 'granted') document.getElementById('push-prompt').style.display = 'block';
+                </script>
+                {% endif %}
             </div>
         </div>
         {% endif %}
@@ -159,6 +167,13 @@
             <i class="ph-bold ph-lock mobile-icon"></i>
             <span>Diary</span>
         </a>
+        <a href="javascript:void(0)" class="mobile-tab" id="tab-notif" onclick="toggleNotifPanel()">
+            <div style="position: relative;">
+                <i class="ph-bold ph-bell mobile-icon"></i>
+                <span class="notif-badge" id="mobileNotifBadge" style="display:none; position: absolute; top: -5px; right: -5px; width: 16px; height: 16px; font-size: 0.6rem;">0</span>
+            </div>
+            <span>Alerts</span>
+        </a>
         <a href="{{ url_for('logout') }}" class="mobile-tab" onclick="appLogout(event)" style="color: #ff4757;">
             <i class="ph-bold ph-sign-out mobile-icon"></i>
             <span>Logout</span>
@@ -190,52 +205,62 @@
 </script>
 
 {% if current_user.is_authenticated %}
-<div id="penguin-companion-wrap" style="position: fixed; bottom: 80px; left: 20px; z-index: 9000; display: flex; align-items: flex-end; gap: 15px;">
-    <div id="penguin-container" onclick="openBigPenguin()" title="Meet your buddy!" style="position: relative; width: 80px; height: 90px; cursor: pointer; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
-        <img src="{{ url_for('static', filename='images/blue_penguin_single.png') }}" id="penguin-char" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));">
-        <div id="p-mouth" style="position: absolute; top: 43%; left: 50%; width: 12px; height: 2px; background: #333; transform: translateX(-50%); border-radius: 50%; opacity: 0; transition: height 0.1s, opacity 0.1s;"></div>
-        <div style="position: absolute; top: -5px; left: -5px; background: white; padding: 4px; border-radius: 50%; font-size: 0.7rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); animation: float 2s infinite ease-in-out;">❤️</div>
+<!-- Full-Screen Voice Companion -->
+<div id="big-penguin-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(180deg, #c3eaff 0%, #a6dcff 100%); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; animation: fadeIn 0.4s ease;">
+    <!-- Close Button -->
+    <button onclick="closeBigPenguin()" style="position: absolute; top: 30px; right: 30px; background: rgba(255,255,255,0.3); border: none; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; backdrop-filter: blur(10px); z-index: 10;"><i class="ph-bold ph-x"></i></button>
+
+    <!-- Language Selector -->
+    <div style="position: absolute; top: 30px; right: 90px; z-index: 10; display: flex; align-items: center; gap: 10px;">
+        <i class="ph-bold ph-translate" style="color: white; font-size: 1.2rem;"></i>
+        <select id="lang-selector" style="background: rgba(255,255,255,0.2); border: 2px solid white; border-radius: 15px; color: white; padding: 10px 15px; font-family: 'Outfit', sans-serif; font-weight: 700; cursor: pointer; outline: none; backdrop-filter: blur(5px);">
+            <option value="en-US" style="color: #333;">English 🇺🇸</option>
+            <option value="kn-IN" style="color: #333;">ಕನ್ನಡ (Kannada) 🇮🇳</option>
+            <option value="hi-IN" style="color: #333;">हिन्दी (Hindi) 🇮🇳</option>
+            <option value="te-IN" style="color: #333;">తెలుగు (Telugu) 🇮🇳</option>
+            <option value="ta-IN" style="color: #333;">தமிழ் (Tamil) 🇮🇳</option>
+        </select>
     </div>
-    
-    <div id="tom-speech-bubble" style="background: white; padding: 12px 18px; border-radius: 20px 20px 20px 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 250px; border: 1px solid rgba(0,0,0,0.05); transform-origin: bottom left;">
-        <p id="tom-status" style="margin: 0; font-size: 0.9rem; font-weight: 700; color: #2c3e50; line-height: 1.4;">HELLO FRIEND! 👋</p>
-        <div style="display: flex; gap: 8px; margin-top: 10px;">
-            <button id="tom-mic-btn" title="Speak to Buddy" style="background: var(--primary); color: white; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; box-shadow: 0 4px 10px rgba(79,172,254,0.3);"><i class="ph-bold ph-microphone"></i></button>
-            <button onclick="openBigPenguin()" style="background: white; color: var(--primary); border: 1px solid var(--primary); padding: 0 12px; border-radius: 18px; cursor: pointer; font-size: 0.8rem; font-weight: bold; height: 36px;">Chat</button>
-        </div>
+
+    <!-- Snowflake Particles Background -->
+    <div style="position: absolute; width: 100%; height: 100%; pointer-events: none; opacity: 0.5;" id="snow-container"></div>
+
+    <div style="position: relative; width: 80%; max-width: 350px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; margin-bottom: 50px;">
+        <!-- Mouth Ripple Effect -->
+        <div id="mouth-ripple" style="position: absolute; top: 43%; left: 50%; width: 60px; height: 60px; background: rgba(255,255,255,0.7); border-radius: 50%; transform: translate(-50%, -50%) scale(0); opacity: 0; transition: all 0.1s ease; box-shadow: 0 0 30px white;"></div>
+        
+        <img src="{{ url_for('static', filename='images/blue_penguin_single.png') }}" id="voice-penguin-img" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.1)); position: relative; z-index: 2;">
+        
+        <!-- Tiny Mouth line over image -->
+        <div id="voice-mouth" style="position: absolute; top: 43.5%; left: 50%; width: 25px; height: 3px; background: #333; border-radius: 2px; transform: translateX(-50%); opacity: 0; z-index: 3;"></div>
+    </div>
+
+    <!-- Interface Controls -->
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; position: relative; z-index: 10;">
+        <button id="main-voice-btn" style="width: 100px; height: 100px; background: #8b5cf6; border: 5px solid white; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 3rem; cursor: pointer; box-shadow: 0 15px 30px rgba(139, 92, 246, 0.4); transition: transform 0.2s, box-shadow 0.2s;">
+            <i class="ph-fill ph-microphone"></i>
+        </button>
+        <p id="voice-label" style="font-family: 'Outfit', sans-serif; font-weight: 800; color: white; font-size: 1.4rem; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">TAP TO CONVERSE</p>
+        <div id="voice-status-bar" style="max-width: 80%; text-align: center; color: rgba(0,0,0,0.4); font-size: 1.1rem; font-weight: 600; min-height: 1.5em;">I'm listening, friend!</div>
     </div>
 </div>
 
-<!-- Big Penguin Modal -->
-<div class="modal-overlay" id="big-penguin-modal" style="z-index: 10000; align-items: center; justify-content: center;">
-    <div class="clay-card" style="max-width: 500px; width: 95vw; border-radius: 40px; padding: 40px; display: flex; flex-direction: column; align-items: center; background: linear-gradient(135deg, #ffffff, #f0f7ff);">
-        <button onclick="closeBigPenguin()" style="position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.05); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;"><i class="ph-bold ph-x"></i></button>
-        
-        <div style="position: relative; width: 180px; height: 200px; margin-bottom: 30px;">
-            <img src="{{ url_for('static', filename='images/blue_penguin_single.png') }}" style="width: 100%; height: 100%; object-fit: contain; animation: float 3s infinite ease-in-out;">
-            <div id="big-p-mouth" style="position: absolute; top: 43%; left: 50%; width: 25px; height: 4px; background: #333; transform: translateX(-50%); border-radius: 50%; opacity: 0; transition: height 0.1s, opacity 0.1s;"></div>
-        </div>
-        
-        <h2 class="handwritten" style="font-size: 2.2rem; margin: 0 0 10px; color: var(--primary);">I'm Glacier! 🐧</h2>
-        <p style="text-align: center; color: var(--text-light); margin-bottom: 25px; font-weight: 500;">I am your personal 2026 coach and best friend!</p>
-        
-        <div id="big-chat-history" style="width: 100%; max-height: 200px; overflow-y: auto; background: rgba(0,0,0,0.03); padding: 15px; border-radius: 20px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px;">
-            <div style="background: white; padding: 10px 15px; border-radius: 15px 15px 15px 5px; max-width: 85%; align-self: flex-start; font-size: 0.9rem; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">Hi! How can I help you reach your goals today?</div>
-        </div>
-        
-        <div style="width: 100%; display: flex; gap: 10px;">
-            <input type="text" id="big-chat-input" class="clay-input" placeholder="Type something sweet..." style="flex: 1; border-radius: 20px; margin: 0;">
-            <button onclick="sendBigChat()" class="clay-button primary" style="padding: 0 25px; border-radius: 20px;"><i class="ph-bold ph-paper-plane-right"></i></button>
-        </div>
+<!-- Bottom Corner Tiny Companion (Trigger) -->
+<div id="penguin-companion-wrap" style="position: fixed; bottom: 80px; left: 20px; z-index: 9000; cursor: pointer;" onclick="openBigPenguin()">
+    <div style="position: relative; width: 70px; height: 80px; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+        <img src="{{ url_for('static', filename='images/blue_penguin_single.png') }}" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.15));">
+        <div id="p-mouth" style="position: absolute; top: 43%; left: 50%; width: 10px; height: 2px; background: #333; transform: translateX(-50%); border-radius: 50%; opacity: 0;"></div>
+        <div style="position: absolute; top: -5px; right: -5px; background: var(--primary); color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.6rem; font-weight: 800; animation: float 2s infinite ease-in-out;">AI BOT</div>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const tomMicBtn = document.getElementById('tom-mic-btn');
-    const tomStatus = document.getElementById('tom-status');
-    const mouth = document.getElementById('p-mouth');
-    const bigMouth = document.getElementById('big-p-mouth');
+    const mainVoiceBtn = document.getElementById('main-voice-btn');
+    const voiceStatus = document.getElementById('voice-status-bar');
+    const ripple = document.getElementById('mouth-ripple');
+    const vMouth = document.getElementById('voice-mouth');
+    const snowContainer = document.getElementById('snow-container');
     
     let isListening = false;
     let recognition = null;
@@ -243,148 +268,135 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    function updateMouth(openPercent) {
-        if(mouth) {
-            mouth.style.height = openPercent + 'px';
-            mouth.style.opacity = openPercent > 0 ? 1 : 0;
-        }
-        if(bigMouth) {
-            bigMouth.style.height = (openPercent * 2) + 'px';
-            bigMouth.style.opacity = openPercent > 0 ? 1 : 0;
-        }
+    // Create Snowflakes
+    for(let i=0; i<30; i++) {
+        let snow = document.createElement('div');
+        snow.innerHTML = '❄';
+        snow.style.position = 'absolute';
+        snow.style.left = Math.random() * 100 + '%';
+        snow.style.top = '-20px';
+        snow.style.color = 'white';
+        snow.style.fontSize = (Math.random() * 20 + 10) + 'px';
+        snow.style.opacity = Math.random();
+        snow.style.animation = `snowfall ${Math.random() * 5 + 5}s linear infinite`;
+        snow.style.animationDelay = Math.random() * 5 + 's';
+        snowContainer.appendChild(snow);
     }
 
-    function animateMouth(text) {
-        let i = 0;
-        const intr = setInterval(() => {
-            if (i >= text.length * 1.5) {
-                clearInterval(intr);
-                updateMouth(0);
-                return;
-            }
-            const openSize = Math.random() > 0.3 ? (Math.random() * 5 + 2) : 0;
-            updateMouth(openSize);
-            i++;
-        }, 100);
+    function animateSpeak(active) {
+        if(active) {
+            ripple.style.opacity = '1';
+            vMouth.style.opacity = '1';
+            let frame = 0;
+            window.speakInterval = setInterval(() => {
+                const s = Math.sin(frame / 2) * 1.5 + 2;
+                ripple.style.transform = `translate(-50%, -50%) scale(${s})`;
+                vMouth.style.height = (Math.random() * 8 + 2) + 'px';
+                frame++;
+            }, 100);
+        } else {
+            clearInterval(window.speakInterval);
+            ripple.style.opacity = '0';
+            ripple.style.transform = `translate(-50%, -50%) scale(0)`;
+            vMouth.style.opacity = '0';
+        }
     }
 
     window.openBigPenguin = function() {
-        document.getElementById('big-penguin-modal').classList.add('active');
-        document.getElementById('big-chat-input').focus();
+        document.getElementById('big-penguin-modal').style.display = 'flex';
+        voiceStatus.innerText = "Tap the mic to start!";
     };
     window.closeBigPenguin = function() {
-        document.getElementById('big-penguin-modal').classList.remove('active');
+        document.getElementById('big-penguin-modal').style.display = 'none';
+        if(recognition) recognition.stop();
+        window.speechSynthesis.cancel();
     };
-
-    window.sendBigChat = async function() {
-        const input = document.getElementById('big-chat-input');
-        const text = input.value.trim();
-        if(!text) return;
-        
-        const history = document.getElementById('big-chat-history');
-        const userMsg = document.createElement('div');
-        userMsg.style = "background: var(--primary); color: white; padding: 10px 15px; border-radius: 15px 15px 5px 15px; max-width: 85%; align-self: flex-end; font-size: 0.9rem; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.1);";
-        userMsg.innerText = text;
-        history.appendChild(userMsg);
-        input.value = "";
-        history.scrollTop = history.scrollHeight;
-
-        const reply = await sendToAI(text);
-    };
-
-    document.getElementById('big-chat-input')?.addEventListener('keydown', e => {
-        if(e.key === 'Enter') sendBigChat();
-    });
 
     async function sendToAI(text) {
         try {
-            tomStatus.innerText = "Thinking...";
+            const langCode = document.getElementById('lang-selector').value;
+            voiceStatus.innerText = "Thinking...";
             const res = await fetch('/api/avatar/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text, history: [] })
+                body: JSON.stringify({ message: text, history: [], lang_code: langCode })
             });
             const data = await res.json();
             if (data.reply) {
-                tomStatus.innerText = data.reply;
-                const history = document.getElementById('big-chat-history');
-                if(history) {
-                    const aiMsg = document.createElement('div');
-                    aiMsg.style = "background: white; padding: 10px 15px; border-radius: 15px 15px 15px 5px; max-width: 85%; align-self: flex-start; font-size: 0.9rem; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.05);";
-                    aiMsg.innerText = data.reply;
-                    history.appendChild(aiMsg);
-                    history.scrollTop = history.scrollHeight;
-                }
-                
-                animateMouth(data.reply);
-                
+                voiceStatus.innerText = data.reply;
                 if ('speechSynthesis' in window) {
-                    const voices = window.speechSynthesis.getVoices();
                     const utterance = new SpeechSynthesisUtterance(data.reply);
-                    // Try to find a friendly voice
-                    const preferredVoice = voices.find(v => v.name.includes('Google') && v.lang.includes('en-GB')) || 
-                                           voices.find(v => v.name.includes('Female')) || 
-                                           voices[0];
-                    if(preferredVoice) utterance.voice = preferredVoice;
+                    utterance.lang = langCode;
+                    const voices = window.speechSynthesis.getVoices();
+                    
+                    // Specific logic to find a voice for the selected language
+                    let voice = voices.find(v => v.lang.startsWith(langCode.split('-')[0])) || voices[0];
+                    if(voice) utterance.voice = voice;
+                    
                     utterance.pitch = 1.3;
-                    utterance.rate = 1.1;
+                    utterance.rate = 1.05;
+                    
+                    utterance.onstart = () => animateSpeak(true);
+                    utterance.onend = () => animateSpeak(false);
+                    
                     window.speechSynthesis.speak(utterance);
                 }
-                return data.reply;
             }
         } catch (e) {
-            tomStatus.innerText = "Tommy got a brain freeze! 🧊";
+            voiceStatus.innerText = "Tommy got a brain freeze! 🧊";
         }
     }
 
-    function createRecognition() {
+    function initRecognition() {
         if(!SpeechRecognition) return null;
         const rec = new SpeechRecognition();
-        rec.lang = 'en-US';
+        const langCode = document.getElementById('lang-selector').value;
+        rec.lang = langCode;
         rec.interimResults = true;
         rec.continuous = false;
 
         rec.onstart = () => {
             isListening = true;
-            tomMicBtn.classList.add('tom-listening');
-            tomStatus.innerText = "Listening...";
+            mainVoiceBtn.style.transform = 'scale(1.1)';
+            mainVoiceBtn.style.boxShadow = '0 0 40px #8b5cf6';
+            voiceStatus.innerText = "Listening...";
         };
 
         rec.onresult = (e) => {
             const liveText = Array.from(e.results).map(r => r[0].transcript).join('');
-            if (liveText) tomStatus.innerText = '🎤 ' + liveText;
+            voiceStatus.innerText = liveText;
             clearTimeout(silenceTimer);
-            silenceTimer = setTimeout(() => { if (isListening && liveText.length > 1) rec.stop(); }, 2000); 
+            silenceTimer = setTimeout(() => { if (isListening) rec.stop(); }, 2000); 
         };
 
         rec.onend = () => {
             isListening = false;
-            tomMicBtn.classList.remove('tom-listening');
-            const final = tomStatus.innerText.replace('🎤 ', '').trim();
-            if(final && final !== "Listening...") sendToAI(final);
-            else tomStatus.innerText = "Tap to Converse";
-        };
-
-        rec.onerror = (e) => {
-            isListening = false;
-            tomMicBtn.classList.remove('tom-listening');
-            tomStatus.innerText = "Tap to try again";
+            mainVoiceBtn.style.transform = 'scale(1)';
+            mainVoiceBtn.style.boxShadow = '0 15px 30px rgba(139, 92, 246, 0.4)';
+            const final = voiceStatus.innerText.trim();
+            if(final && final !== "Tap the mic to start!" && final !== "Listening...") sendToAI(final);
         };
 
         return rec;
     }
 
-    tomMicBtn?.addEventListener('click', () => {
+    mainVoiceBtn?.addEventListener('click', () => {
         if (!SpeechRecognition) {
-            window.openBigPenguin();
+            alert("Voice not supported in this browser.");
             return;
         }
-        if (isListening) { recognition.stop(); return; }
-        recognition = createRecognition();
-        if (recognition) recognition.start();
+        if (isListening) return;
+        recognition = initRecognition();
+        recognition.start();
     });
 });
 </script>
+<style>
+@keyframes snowfall {
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(110vh) rotate(360deg); }
+}
+</style>
 {% endif %}
 
 <script type="module" src="{{ url_for('static', filename='firebase-setup.js') }}"></script>
@@ -417,8 +429,15 @@ async function loadNotifications() {
         if (data.unread > 0) {
             badge.style.display = 'flex';
             badge.textContent = data.unread > 9 ? '9+' : data.unread;
+            const mobileBadge = document.getElementById('mobileNotifBadge');
+            if(mobileBadge) {
+                mobileBadge.style.display = 'flex';
+                mobileBadge.textContent = data.unread > 9 ? '9+' : data.unread;
+            }
         } else {
             badge.style.display = 'none';
+            const mobileBadge = document.getElementById('mobileNotifBadge');
+            if(mobileBadge) mobileBadge.style.display = 'none';
         }
 
         if (data.notifications.length === 0) {
@@ -466,11 +485,19 @@ async function subscribeToPushNotifications(registration) {
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', async function() {
         try {
-            const registration = await navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}");
+            // Force Update logic: If local storage version doesn't match v10, clear cache and reload
+            const APP_VERSION = 'v10';
+            if(localStorage.getItem('app_version') !== APP_VERSION) {
+                localStorage.setItem('app_version', APP_VERSION);
+                const keys = await caches.keys();
+                for(let key of keys) await caches.delete(key);
+                location.reload(true);
+            }
+
+            const registration = await navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}?v=10");
             {% if current_user.is_authenticated %}
             if ('PushManager' in window && Notification.permission === 'default') {
-                const permission = await Notification.requestPermission();
-                if (permission === 'granted') await subscribeToPushNotifications(registration);
+                // We'll show a prompt in the notif panel instead of annoying automatic popups
             }
             {% endif %}
         } catch(err) {
