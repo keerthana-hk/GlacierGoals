@@ -254,7 +254,18 @@
     </div>
 </div>
 
-<script>
+function openBigPenguin() {
+    console.log("Opening Penguin...");
+    document.getElementById('big-penguin-modal').style.display = 'flex';
+    if('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+}
+function closeBigPenguin() {
+    document.getElementById('big-penguin-modal').style.display = 'none';
+    if(window.speechSynthesis) window.speechSynthesis.cancel();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const mainVoiceBtn = document.getElementById('main-voice-btn');
     const voiceStatus = document.getElementById('voice-status-bar');
@@ -494,10 +505,14 @@ if ('serviceWorker' in navigator) {
                 location.reload(true);
             }
 
-            const registration = await navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}?v=10");
+            const registration = await navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}?v=12");
             {% if current_user.is_authenticated %}
-            if ('PushManager' in window && Notification.permission === 'default') {
-                // We'll show a prompt in the notif panel instead of annoying automatic popups
+            // Automatically try to save FCM token if user is logged in
+            if ('serviceWorker' in navigator && window.requestNotificationPermission) {
+                setTimeout(() => { 
+                    console.log("Requesting notif permission...");
+                    window.requestNotificationPermission(); 
+                }, 3000);
             }
             {% endif %}
         } catch(err) {

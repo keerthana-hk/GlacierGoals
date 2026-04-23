@@ -21,8 +21,7 @@ export async function requestNotificationPermission() {
             console.log('Notification permission granted.');
             // Get the token from FCM
             const currentToken = await getToken(messaging, { 
-                // Note: you may need a VAPID key here depending on web push config
-                // vapidKey: 'YOUR_PUBLIC_VAPID_KEY_HERE' 
+                vapidKey: 'BE_rEo8x630K3NCzt1I2OM_w2HJ-QW05pdNdjVbLn9qkXkbJrw8Ym2PeBQJgtzO2z42VZtLMMy_UqGdn2JWqH98' 
             });
             
             if (currentToken) {
