@@ -1,7 +1,7 @@
-const CACHE_NAME = 'glacier-cache-v6';
+const CACHE_NAME = 'glacier-cache-v8';
 const urlsToCache = [
   '/',
-  '/static/css/style.css?v=17',
+  '/static/css/style.css?v=20',
   '/static/manifest.json'
 ];
 
