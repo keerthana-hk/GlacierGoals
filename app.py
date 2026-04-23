@@ -708,6 +708,13 @@ def get_coach_message():
 
     return jsonify({'message': f"📜 Daily Quest: {msg}"})
 
+@app.route('/firebase-messaging-sw.js')
+def firebase_messaging_sw():
+    return send_from_url_static('firebase-messaging-sw.js')
+
+def send_from_url_static(filename):
+    return send_from_directory(os.path.join(app.root_path, 'static'), filename)
+
 @app.route('/api/avatar/chat', methods=['POST'])
 @login_required
 def avatar_chat():
