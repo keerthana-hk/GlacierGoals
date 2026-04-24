@@ -626,7 +626,7 @@ async function subscribeToPushNotifications(registration) {
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', async function() {
         try {
-            const APP_VERSION = 'v13';
+            const APP_VERSION = 'v14';
             if(localStorage.getItem('app_version') !== APP_VERSION) {
                 localStorage.setItem('app_version', APP_VERSION);
                 const keys = await caches.keys();
@@ -634,7 +634,7 @@ if ('serviceWorker' in navigator) {
                 location.reload(true);
             }
 
-            const registration = await navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}?v=13");
+            const registration = await navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}?v=14");
             {% if current_user.is_authenticated %}
             // Automatically try to save FCM token if user is logged in
             if ('serviceWorker' in navigator && window.requestNotificationPermission) {
