@@ -25,23 +25,14 @@ jobs:
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
-      - name: Accept Android Licenses
-        run: |
-          yes | sdkmanager --licenses || true
-
-      - name: Debug Environment
-        run: |
-          ls -R android
-          java -version
-          node -v
-
       - name: Build APK
-        run: |
-          cd android
-          # Use Environment variables for passwords
-          export BUBBLEWRAP_KEYSTORE_PASSWORD="glacier2026"
-          export BUBBLEWRAP_KEY_PASSWORD="glacier2026"
-          bubblewrap build --yes
+        uses: GoogleChromeLabs/bubblewrap-action@main
+        with:
+          project-dir: 'android'
+          keystore-path: 'android.keystore'
+          keystore-password: 'glacier2026'
+          key-alias: 'android'
+          key-password: 'glacier2026'
 
       - name: Create Release
         id: create_release
