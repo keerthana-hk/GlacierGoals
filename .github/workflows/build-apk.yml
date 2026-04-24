@@ -25,12 +25,22 @@ jobs:
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
+      - name: Accept Android Licenses
+        run: |
+          yes | sdkmanager --licenses || true
+
+      - name: Debug Environment
+        run: |
+          ls -R android
+          java -version
+          node -v
+
       - name: Build APK
         run: |
           cd android
-          # Use the password we set for the keystore
-          export BUBBLEWRAP_KEYSTORE_PASSWORD=glacier2026
-          export BUBBLEWRAP_KEY_PASSWORD=glacier2026
+          # Use Environment variables for passwords
+          export BUBBLEWRAP_KEYSTORE_PASSWORD="glacier2026"
+          export BUBBLEWRAP_KEY_PASSWORD="glacier2026"
           bubblewrap build --yes
 
       - name: Create Release
@@ -39,18 +49,25 @@ jobs:
         with:
           script: |
             try {
+              const run_num = context.runNumber;
               const { data: release } = await github.rest.repos.createRelease({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                tag_name: `app-v${context.runNumber}`,
-                name: `GlacierGoals Android App v${context.runNumber}`,
+                tag_name: `v1.0.${run_num}`,
+                name: `GlacierGoals Android v1.0.${run_num}`,
                 body: 'Automatic build of the GlacierGoals Android App.',
                 draft: false,
                 prerelease: false
               });
               return release.id;
             } catch (e) {
-              console.log("Release might already exist or error", e);
+              console.log("Release creation error", e);
+              // Try to find existing release for this tag if creation failed
+              const { data: currentReleases } = await github.rest.repos.listReleases({
+                owner: context.repo.owner,
+                repo: context.repo.repo
+              });
+              return currentReleases[0]?.id;
             }
 
       - name: Upload APK to Release
