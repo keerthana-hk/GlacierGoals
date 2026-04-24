@@ -205,15 +205,15 @@
 </script>
 
 {% if current_user.is_authenticated %}
-<!-- Full-Screen Voice Companion -->
-<div id="big-penguin-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(180deg, #c3eaff 0%, #a6dcff 100%); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; animation: fadeIn 0.4s ease;">
+<!-- Full-Screen Voice Companion (Talking Tom App Style) -->
+<div id="big-penguin-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(180deg, #b3e5fc 0%, #81d4fa 100%); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; animation: fadeIn 0.4s ease;">
     <!-- Close Button -->
-    <button onclick="closeBigPenguin()" style="position: absolute; top: 30px; right: 30px; background: rgba(255,255,255,0.3); border: none; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; backdrop-filter: blur(10px); z-index: 10;"><i class="ph-bold ph-x"></i></button>
+    <button onclick="closeBigPenguin()" style="position: absolute; top: 30px; right: 20px; background: rgba(255,255,255,0.4); border: none; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; backdrop-filter: blur(10px); z-index: 100;"><i class="ph-bold ph-x"></i></button>
 
     <!-- Language Selector -->
-    <div style="position: absolute; top: 30px; right: 90px; z-index: 10; display: flex; align-items: center; gap: 10px;">
+    <div style="position: absolute; top: 30px; left: 20px; z-index: 100; display: flex; align-items: center; gap: 10px;">
         <i class="ph-bold ph-translate" style="color: white; font-size: 1.2rem;"></i>
-        <select id="lang-selector" style="background: rgba(255,255,255,0.2); border: 2px solid white; border-radius: 15px; color: white; padding: 10px 15px; font-family: 'Outfit', sans-serif; font-weight: 700; cursor: pointer; outline: none; backdrop-filter: blur(5px);">
+        <select id="lang-selector" style="background: rgba(255,255,255,0.3); border: 2px solid white; border-radius: 12px; color: white; padding: 8px 12px; font-family: 'Outfit', sans-serif; font-weight: 700; cursor: pointer; outline: none; backdrop-filter: blur(5px);">
             <option value="en-US" style="color: #333;">English 🇺🇸</option>
             <option value="kn-IN" style="color: #333;">ಕನ್ನಡ (Kannada) 🇮🇳</option>
             <option value="hi-IN" style="color: #333;">हिन्दी (Hindi) 🇮🇳</option>
@@ -223,183 +223,311 @@
     </div>
 
     <!-- Snowflake Particles Background -->
-    <div style="position: absolute; width: 100%; height: 100%; pointer-events: none; opacity: 0.5;" id="snow-container"></div>
+    <div style="position: absolute; width: 100%; height: 100%; pointer-events: none; opacity: 0.6;" id="snow-container"></div>
 
-    <div style="position: relative; width: 80%; max-width: 350px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; margin-bottom: 50px;">
-        <!-- Mouth Ripple Effect -->
-        <div id="mouth-ripple" style="position: absolute; top: 43%; left: 50%; width: 60px; height: 60px; background: rgba(255,255,255,0.7); border-radius: 50%; transform: translate(-50%, -50%) scale(0); opacity: 0; transition: all 0.1s ease; box-shadow: 0 0 30px white;"></div>
+    <!-- Big Penguin Container -->
+    <div id="big-penguin-wrap" style="position: relative; width: 85%; max-width: 400px; aspect-ratio: 0.8; display: flex; align-items: center; justify-content: center; margin-bottom: 40px; transition: transform 0.3s ease;">
+        <!-- Mouth Ripple Effect (Voice Activity) -->
+        <div id="mouth-ripple" style="position: absolute; top: 43%; left: 50%; width: 80px; height: 80px; background: rgba(255,255,255,0.8); border-radius: 50%; transform: translate(-50%, -50%) scale(0); opacity: 0; transition: all 0.1s ease; box-shadow: 0 0 40px white;"></div>
         
-        <img src="{{ url_for('static', filename='images/blue_penguin_single.png') }}" id="voice-penguin-img" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.1)); position: relative; z-index: 2;">
+        <img src="{{ url_for('static', filename='images/blue_penguin_single.png') }}" id="voice-penguin-img" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 25px 50px rgba(0,0,0,0.15)); position: relative; z-index: 2;">
         
-        <!-- Tiny Mouth line over image -->
-        <div id="voice-mouth" style="position: absolute; top: 43.5%; left: 50%; width: 25px; height: 3px; background: #333; border-radius: 2px; transform: translateX(-50%); opacity: 0; z-index: 3;"></div>
+        <!-- Big Animated Mouth -->
+        <div id="voice-mouth" class="p-mouth" style="width: 20px; height: 0px; top: 45%; left: 50%; background: #ff4757; opacity: 0;"></div>
+    </div>
+
+    <!-- Chat Bubble (Talking Tom Style) -->
+    <div id="big-tom-bubble" style="background: white; padding: 15px 25px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 80%; margin-bottom: 30px; position: relative; display: none;">
+        <p id="big-tom-text" style="margin: 0; font-family: 'Outfit', sans-serif; font-weight: 600; color: #2c3e50; font-size: 1.1rem; text-align: center;">...</p>
+        <div style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); border-width: 10px 10px 0 10px; border-style: solid; border-color: white transparent transparent transparent;"></div>
     </div>
 
     <!-- Interface Controls -->
-    <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; position: relative; z-index: 10;">
-        <button id="main-voice-btn" style="width: 100px; height: 100px; background: #8b5cf6; border: 5px solid white; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 3rem; cursor: pointer; box-shadow: 0 15px 30px rgba(139, 92, 246, 0.4); transition: transform 0.2s, box-shadow 0.2s;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%; position: relative; z-index: 10;">
+        <button id="main-voice-btn" class="tom-mic-trigger" style="width: 90px; height: 90px; background: #8b5cf6; border: 4px solid white; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; cursor: pointer; box-shadow: 0 15px 35px rgba(139, 92, 246, 0.4); transition: all 0.2s;">
             <i class="ph-fill ph-microphone"></i>
         </button>
-        <p id="voice-label" style="font-family: 'Outfit', sans-serif; font-weight: 800; color: white; font-size: 1.4rem; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">TAP TO CONVERSE</p>
-        <div id="voice-status-bar" style="max-width: 80%; text-align: center; color: rgba(0,0,0,0.4); font-size: 1.1rem; font-weight: 600; min-height: 1.5em;">I'm listening, friend!</div>
+        <p id="voice-label" style="font-family: 'Outfit', sans-serif; font-weight: 800; color: white; font-size: 1.2rem; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">HOLD TO TALK</p>
     </div>
 </div>
 
-<!-- Bottom Corner Tiny Companion (Trigger) -->
-<div id="penguin-companion-wrap" style="position: fixed; bottom: 80px; left: 20px; z-index: 9000; cursor: pointer;" onclick="openBigPenguin()">
-    <div style="position: relative; width: 70px; height: 80px; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-        <img src="{{ url_for('static', filename='images/blue_penguin_single.png') }}" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.15));">
-        <div id="p-mouth" style="position: absolute; top: 43%; left: 50%; width: 10px; height: 2px; background: #333; transform: translateX(-50%); border-radius: 50%; opacity: 0;"></div>
-        <div style="position: absolute; top: -5px; right: -5px; background: var(--primary); color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.6rem; font-weight: 800; animation: float 2s infinite ease-in-out;">AI BOT</div>
+<!-- Tiny Talking Tom Companion (Bottom Left) -->
+<div id="penguin-companion-wrap">
+    <div id="tom-speech-bubble" style="display: none;">
+        <p id="tom-status">Hello!</p>
+    </div>
+    
+    <div id="penguin-container" onclick="openBigPenguin()">
+        <img src="{{ url_for('static', filename='images/blue_penguin_single.png') }}" class="p-character-img">
+        <div class="p-mouth" id="companion-mouth"></div>
+        <div style="position: absolute; top: -10px; right: -5px; background: #8b5cf6; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.65rem; font-weight: 800; box-shadow: 0 3px 8px rgba(0,0,0,0.2); z-index: 20;">AI BUDDY</div>
+    </div>
+
+    <button id="tom-mic-btn" onclick="startCompanionVoice(event)" title="Talk to Penguin">
+        <i class="ph-fill ph-microphone"></i>
+    </button>
 </div>
 
 <script>
-function openBigPenguin() {
-    console.log("Opening Penguin...");
-    document.getElementById('big-penguin-modal').style.display = 'flex';
-    if('Notification' in window && Notification.permission === 'default') {
-        Notification.requestPermission();
-    }
-}
-function closeBigPenguin() {
-    document.getElementById('big-penguin-modal').style.display = 'none';
-    if(window.speechSynthesis) window.speechSynthesis.cancel();
-}
+// Master Global Controller for Penguin
+const PenguinBuddy = {
+    isListening: false,
+    isSpeaking: false,
+    recognition: null,
+    silenceTimer: null,
+    currentMode: 'tiny', // 'tiny' or 'big'
+    voices: [],
 
-document.addEventListener('DOMContentLoaded', () => {
-    const mainVoiceBtn = document.getElementById('main-voice-btn');
-    const voiceStatus = document.getElementById('voice-status-bar');
-    const ripple = document.getElementById('mouth-ripple');
-    const vMouth = document.getElementById('voice-mouth');
-    const snowContainer = document.getElementById('snow-container');
-    
-    let isListening = false;
-    let recognition = null;
-    let silenceTimer = null;
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    // Create Snowflakes
-    for(let i=0; i<30; i++) {
-        let snow = document.createElement('div');
-        snow.innerHTML = '❄';
-        snow.style.position = 'absolute';
-        snow.style.left = Math.random() * 100 + '%';
-        snow.style.top = '-20px';
-        snow.style.color = 'white';
-        snow.style.fontSize = (Math.random() * 20 + 10) + 'px';
-        snow.style.opacity = Math.random();
-        snow.style.animation = `snowfall ${Math.random() * 5 + 5}s linear infinite`;
-        snow.style.animationDelay = Math.random() * 5 + 's';
-        snowContainer.appendChild(snow);
-    }
-
-    function animateSpeak(active) {
-        if(active) {
-            ripple.style.opacity = '1';
-            vMouth.style.opacity = '1';
-            let frame = 0;
-            window.speakInterval = setInterval(() => {
-                const s = Math.sin(frame / 2) * 1.5 + 2;
-                ripple.style.transform = `translate(-50%, -50%) scale(${s})`;
-                vMouth.style.height = (Math.random() * 8 + 2) + 'px';
-                frame++;
-            }, 100);
-        } else {
-            clearInterval(window.speakInterval);
-            ripple.style.opacity = '0';
-            ripple.style.transform = `translate(-50%, -50%) scale(0)`;
-            vMouth.style.opacity = '0';
+    init() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            console.warn("Speech recognition not supported.");
+            return;
         }
-    }
+        this.recognition = new SpeechRecognition();
+        this.setupRecognition();
+        this.createSnow();
+        
+        // Load voices
+        const loadVoices = () => {
+            this.voices = window.speechSynthesis.getVoices();
+        };
+        loadVoices();
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+    },
 
-    window.openBigPenguin = function() {
-        document.getElementById('big-penguin-modal').style.display = 'flex';
-        voiceStatus.innerText = "Tap the mic to start!";
-    };
-    window.closeBigPenguin = function() {
-        document.getElementById('big-penguin-modal').style.display = 'none';
-        if(recognition) recognition.stop();
-        window.speechSynthesis.cancel();
-    };
+    setupRecognition() {
+        this.recognition.continuous = false;
+        this.recognition.interimResults = true;
 
-    async function sendToAI(text) {
+        this.recognition.onstart = () => {
+            this.isListening = true;
+            this.updateUIStatus(true);
+            this.animateBody(true, 'listen');
+        };
+
+        this.recognition.onresult = (e) => {
+            const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
+            this.showLiveText(transcript);
+            clearTimeout(this.silenceTimer);
+            this.silenceTimer = setTimeout(() => { if(this.isListening) this.recognition.stop(); }, 2000);
+        };
+
+        this.recognition.onend = () => {
+            this.isListening = false;
+            this.updateUIStatus(false);
+            this.animateBody(false);
+            const final = this.getVisibleText();
+            if (final && !final.includes('...') && final !== 'Listening...') {
+                this.sendToAI(final);
+            }
+        };
+
+        this.recognition.onerror = () => {
+            this.isListening = false;
+            this.updateUIStatus(false);
+            this.animateBody(false);
+        };
+    },
+
+    updateUIStatus(listening) {
+        const bigBtn = document.getElementById('main-voice-btn');
+        const tinyBtn = document.getElementById('tom-mic-btn');
+        const label = document.getElementById('voice-label');
+        const status = document.getElementById('tom-status');
+        const bubble = document.getElementById('tom-speech-bubble');
+
+        if (listening) {
+            if(bigBtn) bigBtn.classList.add('tom-listening');
+            if(tinyBtn) tinyBtn.classList.add('tom-listening');
+            if(label) label.innerText = "LISTENING...";
+            if(status) status.innerText = "Listening...";
+            if(bubble) {
+                bubble.style.display = 'flex';
+                bubble.style.opacity = '1';
+            }
+        } else {
+            if(bigBtn) bigBtn.classList.remove('tom-listening');
+            if(tinyBtn) tinyBtn.classList.remove('tom-listening');
+            if(label) label.innerText = "TAP TO TALK";
+        }
+    },
+
+    showLiveText(text) {
+        const bigText = document.getElementById('big-tom-text');
+        const bigBubble = document.getElementById('big-tom-bubble');
+        const tinyStatus = document.getElementById('tom-status');
+        const tinyBubble = document.getElementById('tom-speech-bubble');
+
+        if(bigText) {
+            bigText.innerText = text;
+            bigBubble.style.display = 'block';
+        }
+        if(tinyStatus) {
+            tinyStatus.innerText = text;
+            if(tinyBubble) {
+                tinyBubble.style.display = 'flex';
+                tinyBubble.style.opacity = '1';
+            }
+        }
+    },
+
+    getVisibleText() {
+        const bigText = document.getElementById('big-tom-text');
+        const tinyStatus = document.getElementById('tom-status');
+        return (this.currentMode === 'big' ? bigText?.innerText : tinyStatus?.innerText) || '';
+    },
+
+    async sendToAI(text) {
+        const langCode = document.getElementById('lang-selector').value;
+        const msg = text.trim();
+        
+        this.showLiveText("Thinking...");
+
         try {
-            const langCode = document.getElementById('lang-selector').value;
-            voiceStatus.innerText = "Thinking...";
             const res = await fetch('/api/avatar/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text, history: [], lang_code: langCode })
+                body: JSON.stringify({ message: msg, lang_code: langCode, history: [] })
             });
             const data = await res.json();
+            
             if (data.reply) {
-                voiceStatus.innerText = data.reply;
-                if ('speechSynthesis' in window) {
-                    const utterance = new SpeechSynthesisUtterance(data.reply);
-                    utterance.lang = langCode;
-                    const voices = window.speechSynthesis.getVoices();
-                    
-                    // Specific logic to find a voice for the selected language
-                    let voice = voices.find(v => v.lang.startsWith(langCode.split('-')[0])) || voices[0];
-                    if(voice) utterance.voice = voice;
-                    
-                    utterance.pitch = 1.3;
-                    utterance.rate = 1.05;
-                    
-                    utterance.onstart = () => animateSpeak(true);
-                    utterance.onend = () => animateSpeak(false);
-                    
-                    window.speechSynthesis.speak(utterance);
-                }
+                this.speak(data.reply, langCode);
+            } else {
+                this.showLiveText("Tommy got a brain freeze! 🧊");
             }
-        } catch (e) {
-            voiceStatus.innerText = "Tommy got a brain freeze! 🧊";
+        } catch(e) {
+            this.showLiveText("Oops! Connection error ❄️");
+        }
+    },
+
+    speak(text, lang) {
+        if (!('speechSynthesis' in window)) return;
+        
+        window.speechSynthesis.cancel();
+        this.showLiveText(text);
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = lang;
+        
+        const voice = this.voices.find(v => v.lang.startsWith(lang.split('-')[0])) || this.voices[0];
+        if(voice) utterance.voice = voice;
+        
+        utterance.pitch = 1.4; 
+        utterance.rate = 1.0;
+
+        utterance.onstart = () => {
+            this.animateMouth(true);
+            this.animateBody(true, 'speak');
+        };
+        utterance.onend = () => {
+            this.animateMouth(false);
+            this.animateBody(false);
+            if(this.currentMode === 'tiny') {
+                setTimeout(() => {
+                    const bubble = document.getElementById('tom-speech-bubble');
+                    if(bubble && !this.isListening && !this.isSpeaking) {
+                        bubble.style.opacity = '0';
+                        setTimeout(() => { if(bubble.style.opacity === '0') bubble.style.display = 'none'; }, 300);
+                    }
+                }, 5000);
+            }
+        };
+
+        window.speechSynthesis.speak(utterance);
+    },
+
+    animateMouth(active) {
+        this.isSpeaking = active;
+        const mouths = [document.getElementById('voice-mouth'), document.getElementById('companion-mouth')];
+        const ripple = document.getElementById('mouth-ripple');
+
+        if (active) {
+            if(ripple) { ripple.style.opacity = '1'; ripple.style.transform = 'translate(-50%, -50%) scale(1.5)'; }
+            mouths.forEach(m => { if(m) { m.style.opacity = '1'; m.style.height = '12px'; } });
+            
+            this.mouthTimer = setInterval(() => {
+                const h = Math.floor(Math.random() * 12 + 4) + 'px';
+                mouths.forEach(m => { if(m) m.style.height = h; });
+            }, 80);
+        } else {
+            clearInterval(this.mouthTimer);
+            if(ripple) { ripple.style.opacity = '0'; ripple.style.transform = 'translate(-50%, -50%) scale(0)'; }
+            mouths.forEach(m => { if(m) { m.style.opacity = '0'; m.style.height = '0px'; } });
+        }
+    },
+
+    animateBody(active, type) {
+        const bigPenguin = document.getElementById('big-penguin-wrap');
+        const tinyPenguin = document.getElementById('penguin-container');
+        
+        if (active) {
+            const animClass = type === 'speak' ? 'penguin-bounce' : 'penguin-shake';
+            if(bigPenguin) bigPenguin.classList.add(animClass);
+            if(tinyPenguin) tinyPenguin.classList.add(animClass);
+        } else {
+            if(bigPenguin) { bigPenguin.classList.remove('penguin-bounce', 'penguin-shake'); }
+            if(tinyPenguin) { tinyPenguin.classList.remove('penguin-bounce', 'penguin-shake'); }
+        }
+    },
+
+    createSnow() {
+        const container = document.getElementById('snow-container');
+        if(!container) return;
+        container.innerHTML = '';
+        for(let i=0; i<20; i++) {
+            let snow = document.createElement('div');
+            snow.innerHTML = '❄';
+            snow.style.position = 'absolute';
+            snow.style.left = Math.random() * 100 + '%';
+            snow.style.top = '-20px';
+            snow.style.color = 'white';
+            snow.style.fontSize = (Math.random() * 15 + 10) + 'px';
+            snow.style.opacity = Math.random();
+            snow.style.animation = `snowfall ${Math.random() * 5 + 5}s linear infinite`;
+            container.appendChild(snow);
         }
     }
+};
 
-    function initRecognition() {
-        if(!SpeechRecognition) return null;
-        const rec = new SpeechRecognition();
-        const langCode = document.getElementById('lang-selector').value;
-        rec.lang = langCode;
-        rec.interimResults = true;
-        rec.continuous = false;
+function openBigPenguin() {
+    PenguinBuddy.currentMode = 'big';
+    const modal = document.getElementById('big-penguin-modal');
+    modal.style.display = 'flex';
+    const bubble = document.getElementById('big-tom-bubble');
+    if(bubble) bubble.style.display = 'none';
+    if('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+}
 
-        rec.onstart = () => {
-            isListening = true;
-            mainVoiceBtn.style.transform = 'scale(1.1)';
-            mainVoiceBtn.style.boxShadow = '0 0 40px #8b5cf6';
-            voiceStatus.innerText = "Listening...";
-        };
+function closeBigPenguin() {
+    document.getElementById('big-penguin-modal').style.display = 'none';
+    window.speechSynthesis.cancel();
+    if(PenguinBuddy.recognition) PenguinBuddy.recognition.stop();
+}
 
-        rec.onresult = (e) => {
-            const liveText = Array.from(e.results).map(r => r[0].transcript).join('');
-            voiceStatus.innerText = liveText;
-            clearTimeout(silenceTimer);
-            silenceTimer = setTimeout(() => { if (isListening) rec.stop(); }, 2000); 
-        };
-
-        rec.onend = () => {
-            isListening = false;
-            mainVoiceBtn.style.transform = 'scale(1)';
-            mainVoiceBtn.style.boxShadow = '0 15px 30px rgba(139, 92, 246, 0.4)';
-            const final = voiceStatus.innerText.trim();
-            if(final && final !== "Tap the mic to start!" && final !== "Listening...") sendToAI(final);
-        };
-
-        return rec;
+function startCompanionVoice(event) {
+    if(event) event.stopPropagation();
+    PenguinBuddy.currentMode = 'tiny';
+    if(PenguinBuddy.isListening) {
+        PenguinBuddy.recognition.stop();
+    } else {
+        PenguinBuddy.recognition.start();
     }
+}
 
-    mainVoiceBtn?.addEventListener('click', () => {
-        if (!SpeechRecognition) {
-            alert("Voice not supported in this browser.");
-            return;
-        }
-        if (isListening) return;
-        recognition = initRecognition();
-        recognition.start();
-    });
+document.addEventListener('DOMContentLoaded', () => {
+    PenguinBuddy.init();
+    
+    const bigMic = document.getElementById('main-voice-btn');
+    if(bigMic) {
+        bigMic.addEventListener('click', () => {
+            if(PenguinBuddy.isListening) PenguinBuddy.recognition.stop();
+            else PenguinBuddy.recognition.start();
+        });
+    }
 });
 </script>
 <style>
@@ -407,7 +535,9 @@ document.addEventListener('DOMContentLoaded', () => {
     0% { transform: translateY(0) rotate(0deg); }
     100% { transform: translateY(110vh) rotate(360deg); }
 }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 </style>
+
 {% endif %}
 
 <script type="module" src="{{ url_for('static', filename='firebase-setup.js') }}"></script>

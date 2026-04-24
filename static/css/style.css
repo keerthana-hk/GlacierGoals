@@ -623,7 +623,22 @@ body.theme-midnight .hm-day { background: rgba(255,255,255,0.05); }
     .mood-emoji-btn { width: 50px !important; height: 50px !important; font-size: 1.5rem !important; }
 }
 
-/* Hide mobile bottom nav on Desktop */
-@media (min-width: 769px) {
-    .mobile-bottom-nav { display: none !important; }
+/* Animations for Penguin Buddy */
+@keyframes penguin-bounce {
+    0%, 100% { transform: scale(1) translateY(0); }
+    50% { transform: scale(1.05) translateY(-5px); }
+}
+
+@keyframes penguin-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px) rotate(-1deg); }
+    75% { transform: translateX(2px) rotate(1deg); }
+}
+
+.penguin-bounce {
+    animation: penguin-bounce 0.4s ease infinite;
+}
+
+.penguin-shake {
+    animation: penguin-shake 0.2s ease infinite;
 }

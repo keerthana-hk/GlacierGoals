@@ -742,6 +742,8 @@ def avatar_chat():
         system_prompt = f"""You are Glacier Buddy — a tiny, cute, and very excited baby penguin! 
 You are talking to your best friend {current_user.nickname or current_user.name or current_user.email.split('@')[0]}. 
 
+{habit_context}
+
 IMPORTANT: You MUST respond ONLY in {lang_name}. Use appropriate grammar and a friendly tone suitable for {lang_name}.
 
 YOUR MISSION:
