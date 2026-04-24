@@ -756,7 +756,7 @@ You are talking to your best friend {current_user.nickname or current_user.name 
 
 {habit_context}
 
-IMPORTANT: You MUST respond ONLY in {lang_name}. Use appropriate grammar and a friendly tone suitable for {lang_name}.
+IMPORTANT: You should primarily respond in {lang_name}, but you are welcome to use common English words or a "mixed" style (like Manglish/Hinglish) if it sounds more natural and friendly for daily conversation.
 
 YOUR MISSION:
 1. Always start your replies with an EXCITED greeting in {lang_name}!
@@ -768,8 +768,8 @@ YOUR MISSION:
 
         messages = [{"role": "system", "content": system_prompt}]
         for h in history[-10:]:
-            role = "assistant" if h['role'] == 'model' else h['role']
-            messages.append({"role": role, "content": h['content']})
+            role = "assistant" if h.get('role') == 'model' else h.get('role', 'user')
+            messages.append({"role": role, "content": h.get('content', '')})
         messages.append({"role": "user", "content": message})
 
         resp = groq_client.chat.completions.create(
@@ -777,7 +777,15 @@ YOUR MISSION:
             messages=messages,
             max_tokens=250, timeout=15
         )
-        reply = resp.choices[0].message.content.replace('**', '').strip()
+        
+        if not resp.choices:
+            return jsonify({'success': False, 'reply': "Hmm, I lost my train of thought! Can you say that again? 🐧"})
+            
+        reply = resp.choices[0].message.content
+        if not reply:
+            return jsonify({'success': False, 'reply': "Tommy got a bit confused! Try again? 🧊"})
+            
+        reply = reply.replace('**', '').strip()
         return jsonify({'success': True, 'reply': reply})
 
     except Exception as e:
