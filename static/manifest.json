@@ -1,16 +1,25 @@
 {
-  "name": "GlacierGoals - Habit Tracker",
+  "name": "GlacierGoals: AI Resolution Tracker",
   "short_name": "GlacierGoals",
-  "description": "Your ultimate resolution and habit tracker with an AI companion.",
+  "description": "Achieve your 2026 goals with a caring AI Penguin buddy, Secure Vault, and Future Letters.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a1e32",
   "theme_color": "#0a1e32",
+  "orientation": "portrait",
+  "categories": ["productivity", "lifestyle"],
   "icons": [
     {
-      "src": "/static/images/penguin_v2.jpg",
-      "sizes": "192x192 512x512",
-      "type": "image/jpeg"
+      "src": "/static/images/blue_penguin_single.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/images/blue_penguin_single.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
