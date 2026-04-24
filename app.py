@@ -49,10 +49,22 @@ login_manager.login_view = 'login'
 try:
     with app.app_context():
         db.create_all()
+        # Failsafe for recent schema changes (check if column exists, if not add it)
+        from sqlalchemy import text, inspect
+        inspector = inspect(db.engine)
+        columns = [c['name'] for c in inspector.get_columns('resolution')]
+        if 'is_graveyard' not in columns:
+            db.session.execute(text('ALTER TABLE resolution ADD COLUMN is_graveyard BOOLEAN DEFAULT FALSE'))
+            db.session.commit()
+        if 'graveyard_reason' not in columns:
+            db.session.execute(text('ALTER TABLE resolution ADD COLUMN graveyard_reason TEXT'))
+            db.session.commit()
+        if 'pet_health' not in [c['name'] for c in inspector.get_columns('user')]:
+            db.session.execute(text('ALTER TABLE user ADD COLUMN pet_health INTEGER DEFAULT 100'))
+            db.session.commit()
     print("Database tables initialized successfully.")
 except Exception as db_err:
     print(f"DATABASE INIT ERROR: {db_err}")
-    # We continue so the app can at least start and give us logs
 
 # Force HTTPS in production
 @app.before_request
