@@ -28,16 +28,10 @@ jobs:
       - name: Build APK
         run: |
           cd android
+          chmod +x gradlew
           export BUBBLEWRAP_KEYSTORE_PASSWORD="glacier2026"
           export BUBBLEWRAP_KEY_PASSWORD="glacier2026"
-          # Try to build (Bubblewrap build will generate the project structure if missing)
           bubblewrap build --yes
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v3
-        with:
-          name: glaciergoals-apk
-          path: android/*.apk
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
