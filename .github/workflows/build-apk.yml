@@ -1,4 +1,4 @@
-name: Build and Release Android App
+name: Build Android App
 
 on:
   push:
@@ -11,13 +11,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: set up JDK 17
+      - name: Setup Java
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: '18'
@@ -26,57 +26,25 @@ jobs:
         run: npm install -g @bubblewrap/cli
 
       - name: Build APK
-        uses: GoogleChromeLabs/bubblewrap-action@main
+        run: |
+          cd android
+          export BUBBLEWRAP_KEYSTORE_PASSWORD="glacier2026"
+          export BUBBLEWRAP_KEY_PASSWORD="glacier2026"
+          # Try to build (Bubblewrap build will generate the project structure if missing)
+          bubblewrap build --yes
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
         with:
-          project-dir: 'android'
-          keystore-path: 'android.keystore'
-          keystore-password: 'glacier2026'
-          key-alias: 'android'
-          key-password: 'glacier2026'
+          name: glaciergoals-apk
+          path: android/*.apk
 
       - name: Create Release
-        id: create_release
-        uses: actions/github-script@v6
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/heads/main')
         with:
-          script: |
-            try {
-              const run_num = context.runNumber;
-              const { data: release } = await github.rest.repos.createRelease({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                tag_name: `v1.0.${run_num}`,
-                name: `GlacierGoals Android v1.0.${run_num}`,
-                body: 'Automatic build of the GlacierGoals Android App.',
-                draft: false,
-                prerelease: false
-              });
-              return release.id;
-            } catch (e) {
-              console.log("Release creation error", e);
-              // Try to find existing release for this tag if creation failed
-              const { data: currentReleases } = await github.rest.repos.listReleases({
-                owner: context.repo.owner,
-                repo: context.repo.repo
-              });
-              return currentReleases[0]?.id;
-            }
-
-      - name: Upload APK to Release
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const fs = require('fs');
-            const path = require('path');
-            const release_id = '${{ steps.create_release.outputs.result }}';
-            if (!release_id) return;
-            
-            const apkPath = 'android/app-release-signed.apk';
-            if (fs.existsSync(apkPath)) {
-              await github.rest.repos.uploadReleaseAsset({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                release_id: release_id,
-                name: 'GlacierGoals.apk',
-                data: fs.readFileSync(apkPath)
-              });
-            }
+          tag_name: v1.0.${{ github.run_number }}
+          name: GlacierGoals v1.0.${{ github.run_number }}
+          files: android/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
