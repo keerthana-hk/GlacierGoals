@@ -1,0 +1,159 @@
+
+    Directory: D:\2026 resolution tracker\android
+
+Mode             LastWriteTime
+----             -------------
+d----      26-04-2026    11:15
+d----      24-04-2026    23:18
+d----      26-04-2026    11:17
+d----      24-04-2026    23:18
+-a---      24-04-2026    23:36
+-a---      24-04-2026    19:26
+-a---      24-04-2026    19:26
+-a---      24-04-2026    19:26
+-a---      24-04-2026    19:26
+-a---      24-04-2026    19:26
+-a---      24-04-2026    23:48
+
+    Directory: D:\2026 resolution tracker\android\.gradle
+
+Mode             LastWriteTime
+----             -------------
+d----      26-04-2026    11:17
+d----      26-04-2026    11:15
+d----      26-04-2026    11:17
+
+    Directory: D:\2026 resolution tracker\android\.gradle\8.11.1
+
+Mode             LastWriteTime
+----             -------------
+d----      26-04-2026    11:15
+d----      26-04-2026    11:17
+d----      26-04-2026    11:15
+d----      26-04-2026    11:17
+d----      26-04-2026    11:15
+d----      26-04-2026    11:15
+-a---      26-04-2026    11:17
+
+    Directory: D:\2026 resolution tracker\android\.gradle\8.11.1\checksums
+
+Mode             LastWriteTime
+----             -------------
+-a---      26-04-2026    11:47
+-a---      26-04-2026    11:16
+-a---      26-04-2026    11:17
+
+    Directory: D:\2026 resolution tracker\android\.gradle\8.11.1\executionHistory
+
+Mode             LastWriteTime
+----             -------------
+-a---      26-04-2026    11:47
+
+    Directory: D:\2026 resolution tracker\android\.gradle\8.11.1\fileChanges
+
+Mode             LastWriteTime
+----             -------------
+-a---      26-04-2026    11:47
+
+    Directory: D:\2026 resolution tracker\android\.gradle\8.11.1\fileHashes
+
+Mode             LastWriteTime
+----             -------------
+-a---      26-04-2026    11:47
+
+    Directory: D:\2026 resolution tracker\android\.gradle\buildOutputCleanup
+
+Mode             LastWriteTime
+----             -------------
+-a---      26-04-2026    11:47
+-a---      26-04-2026    11:15
+
+    Directory: D:\2026 resolution tracker\android\.gradle\vcs-1
+
+Mode             LastWriteTime
+----             -------------
+-a---      26-04-2026    11:17
+
+    Directory: D:\2026 resolution tracker\android\app
+
+Mode             LastWriteTime
+----             -------------
+d----      24-04-2026    23:18
+
+    Directory: D:\2026 resolution tracker\android\app\src
+
+Mode             LastWriteTime
+----             -------------
+d----      24-04-2026    23:18
+
+    Directory: D:\2026 resolution tracker\android\app\src\main
+
+Mode             LastWriteTime
+----             -------------
+d----      24-04-2026    23:18
+
+    Directory: D:\2026 resolution tracker\android\app\src\main\res
+
+Mode             LastWriteTime
+----             -------------
+d----      24-04-2026    23:18
+d----      24-04-2026    23:18
+d----      24-04-2026    23:18
+d----      24-04-2026    23:18
+
+    Directory: D:\2026 resolution tracker\android\app\src\main\res\drawable-anydpi
+
+Mode             LastWriteTime
+----             -------------
+-a---      24-04-2026    19:26
+
+    Directory: D:\2026 resolution tracker\android\app\src\main\res\mipmap-anydpi-v26
+
+Mode             LastWriteTime
+----             -------------
+-a---      24-04-2026    19:26
+
+    Directory: D:\2026 resolution tracker\android\app\src\main\res\values
+
+Mode             LastWriteTime
+----             -------------
+-a---      24-04-2026    19:26
+
+    Directory: D:\2026 resolution tracker\android\app\src\main\res\xml
+
+Mode             LastWriteTime
+----             -------------
+-a---      24-04-2026    19:26
+-a---      24-04-2026    19:26
+
+    Directory: D:\2026 resolution tracker\android\build
+
+Mode             LastWriteTime
+----             -------------
+d----      26-04-2026    11:17
+
+    Directory: D:\2026 resolution tracker\android\build\reports
+
+Mode             LastWriteTime
+----             -------------
+d----      26-04-2026    11:47
+
+    Directory: D:\2026 resolution tracker\android\build\reports\problems
+
+Mode             LastWriteTime
+----             -------------
+-a---      26-04-2026    11:47
+
+    Directory: D:\2026 resolution tracker\android\gradle
+
+Mode             LastWriteTime
+----             -------------
+d----      24-04-2026    23:18
+
+    Directory: D:\2026 resolution tracker\android\gradle\wrapper
+
+Mode             LastWriteTime
+----             -------------
+-a---      24-04-2026    19:26
+-a---      24-04-2026    19:26
+

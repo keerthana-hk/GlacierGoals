@@ -150,9 +150,18 @@ android {
 
         
     }
+    signingConfigs {
+        release {
+            storeFile file("../android.keystore")
+            storePassword System.getenv("BUBBLEWRAP_KEYSTORE_PASSWORD")
+            keyAlias "android"
+            keyPassword System.getenv("BUBBLEWRAP_KEY_PASSWORD")
+        }
+    }
     buildTypes {
         release {
             minifyEnabled true
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {

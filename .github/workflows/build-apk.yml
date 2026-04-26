@@ -22,25 +22,13 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Build APK with Bubblewrap
+      - name: Build APK with Gradle
         run: |
           cd android
-          # Ensure we have the latest CLI and fix permissions
           chmod +x gradlew
-          
-          # Configure Bubblewrap paths non-interactively
-          npx @bubblewrap/cli updateConfig --jdkPath="$JAVA_HOME" --androidSdkPath="$ANDROID_HOME"
-          
-          # Accept Android licenses
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          
-          # Refresh project structure from manifest
-          npx @bubblewrap/cli update --yes || true
-          
-          # Build the APK with passwords and piped enter to handle any unexpected prompts
           export BUBBLEWRAP_KEYSTORE_PASSWORD="glacier2026"
           export BUBBLEWRAP_KEY_PASSWORD="glacier2026"
-          yes "" | npx @bubblewrap/cli build --yes
+          ./gradlew assembleRelease
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
@@ -49,7 +37,6 @@ jobs:
           tag_name: v1.0.${{ github.run_number }}
           name: GlacierGoals v1.0.${{ github.run_number }}
           files: |
-            android/*.apk
             android/app/build/outputs/apk/release/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
