@@ -9,36 +9,39 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
-      - name: Install Bubblewrap
-        run: npm install -g @bubblewrap/cli
-
-      - name: Build APK
+      - name: Build APK with Bubblewrap
         run: |
           cd android
+          # Configure Bubblewrap paths non-interactively
+          npx @bubblewrap/cli updateConfig --jdkPath="$JAVA_HOME" --androidSdkPath="$ANDROID_HOME"
+          
+          # Build the APK
           chmod +x gradlew
           export BUBBLEWRAP_KEYSTORE_PASSWORD="glacier2026"
           export BUBBLEWRAP_KEY_PASSWORD="glacier2026"
-          bubblewrap build --yes
+          npx @bubblewrap/cli build --yes
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/heads/main')
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main'
         with:
           tag_name: v1.0.${{ github.run_number }}
           name: GlacierGoals v1.0.${{ github.run_number }}
-          files: android/*.apk
+          files: |
+            android/*.apk
+            android/app/build/outputs/apk/release/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
