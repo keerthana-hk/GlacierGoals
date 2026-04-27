@@ -1,0 +1,26 @@
+Alias name: android
+Creation date: 24-Apr-2026
+Entry type: PrivateKeyEntry
+Certificate chain length: 1
+Certificate[1]:
+Owner: CN=GlacierGoals, OU=Mobile, O=Glacier, L=Internet, ST=Cloud, C=US
+Issuer: CN=GlacierGoals, OU=Mobile, O=Glacier, L=Internet, ST=Cloud, C=US
+Serial number: 8687f2b2f7c5a282
+Valid from: Fri Apr 24 23:36:56 IST 2026 until: Tue Sep 09 23:36:56 IST 2053
+Certificate fingerprints:
+	 SHA1: B6:D3:07:03:63:E1:D7:38:BA:D0:23:FA:82:31:4F:72:FB:F7:D4:05
+	 SHA256: 68:18:07:9D:1D:D6:E9:CB:28:07:70:3F:03:35:C0:7A:F0:23:27:62:49:5E:7F:8A:9D:A0:EF:00:A6:A6:A1:5C
+Signature algorithm name: SHA384withRSA
+Subject Public Key Algorithm: 2048-bit RSA key
+Version: 3
+
+Extensions: 
+
+#1: ObjectId: 2.5.29.14 Criticality=false
+SubjectKeyIdentifier [
+KeyIdentifier [
+0000: 85 E3 68 C9 BE 1A 2E 67   C8 82 65 ED AE 10 C8 C9  ..h....g..e.....
+0010: D4 94 DA DB                                        ....
+]
+]
+

@@ -724,6 +724,10 @@ def get_coach_message():
 def firebase_messaging_sw():
     return send_from_url_static('firebase-messaging-sw.js')
 
+@app.route('/.well-known/<path:filename>')
+def serve_well_known(filename):
+    return send_from_directory(os.path.join(app.root_path, 'static', '.well-known'), filename)
+
 def send_from_url_static(filename):
     return send_from_directory(os.path.join(app.root_path, 'static'), filename)
 

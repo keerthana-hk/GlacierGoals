@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.onrender.glaciergoals.twa",
+      "sha256_cert_fingerprints": [
+        "68:18:07:9D:1D:D6:E9:CB:28:07:70:3F:03:35:C0:7A:F0:23:27:62:49:5E:7F:8A:9D:A0:EF:00:A6:A6:A1:5C"
+      ]
+    }
+  }
+]
