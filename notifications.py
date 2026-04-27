@@ -86,6 +86,15 @@ def send_fcm_push_notification(fcm_token, title, body):
             title=title,
             body=body,
         ),
+        android=messaging.AndroidConfig(
+            priority='high',
+            notification=messaging.AndroidNotification(
+                priority='max',
+                sound='default',
+                channel_id='default',
+                icon='stock_ticker_update' # Fallback to standard icon handler
+            ),
+        ),
         token=fcm_token,
     )
     

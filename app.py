@@ -1324,8 +1324,14 @@ scheduler = BackgroundScheduler(timezone="Asia/Kolkata")
 def resolution_time_reminders():
     """Runs every minute — notifies users when their habit's start time arrives."""
     with app.app_context():
-        now = datetime.now()
-        current_time = now.strftime("%H:%M")  # e.g. "09:30"
+        from datetime import timezone, timedelta
+        # Force India Standard Time (UTC+5:30)
+        ist = timezone(timedelta(hours=5, minutes=30))
+        now = datetime.now(ist)
+        current_time = now.strftime("%H:%M") 
+        
+        print(f"[NOTIFICATION CHECK] Current IST Time: {current_time}")
+        
         today_str = date.today().isoformat()
 
         # Find all active resolutions with a target_time_start matching right now
