@@ -365,7 +365,15 @@ body.theme-midnight .hm-day { background: rgba(255,255,255,0.05); }
         flex-shrink: 0;
     }
     .notif-bell-btn { font-size: 1.1rem; padding: 6px; }
-    .notif-panel { width: 90vw; right: -50px; left: -100px; margin: 0 auto; top: 60px; }
+    .notif-panel { 
+        position: fixed; 
+        width: 92vw; 
+        left: 4vw; 
+        right: 4vw; 
+        top: 75px; 
+        margin: 0; 
+        max-height: 70vh;
+    }
 
     /* The new bottom mobile app navigation bar */
     .mobile-bottom-nav {
